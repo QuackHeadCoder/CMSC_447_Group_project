@@ -1,0 +1,27 @@
+﻿Requirements
+1. It needs to be a web browser game that should be able to support google, internet explorer, safari and most general use browsers. Microsoft edge is preferred but not required.
+2. The web browser game needs to be used by the keyboard the user is assumed to have. Being able to use the arrow keys to move the character around to dodge meteors
+3. The game needs to run at a constant frame of either 30 frames or 60 frames preferably.
+4. The player needs to be able to move to dodge meteors and to possibly pickup power ups to improve gameplay
+5. Power ups must include things like invulnerability, and more to discuss.
+6. The user should also be able to write their name on the high score and show up on the leaderboard if they scored high enough.
+7. There should also be a leaderboard showing from descending error with #1 player on top
+8. The meteor should kill the player and end the game when hit unless they are under invulnerability or other power ups preventing it to die
+9. Meteors should fall from sky randomly trying to hit the player
+10. Score will be calculated on number of meteors dodged until one hits the player ending the game
+11. There must be a floor/ground so the player can move and land on when they jump.
+System Requirement Specifications
+1. This web browser game needs to be able to be run on any computer capable of running a web browser.
+2. May include but not limited to gaming laptops, pc’s, hamster powered PC’s, steam powered PC’s, solar powered PC, etc.
+3. It should use top of the notch databases, fast, reliable, and an awesome name. It must use the sqlite3 database.
+User Expectation
+1. Users are expected to have a keyboard and be able to play the game using the arrow keys or wasd keys.
+2. The game should not crash or end early resulting in an invalid score
+3. Their high score relies on the reliability of the game to not crash.
+Business Requirements
+1. The business here are quack head coder productions incorporated LLC corporation has a prime directive to be a family safe and family fun environment. We would like the product to be at least rated E for everyone so anyone can play it and distribute it across all the potential meteor dodging youths of our time and hopefully the future.
+Business Rules
+1. Quack head coder productions incorporated LLC corporation have an image to uphold and we want to make sure it is being pursued by the developers as well.
+2. The product needs to be family friendly
+3. It needs to be able to run on even the worst computers as long as the computer can run a web browser, this may include a lemon powered PC
+4. This product must uphold UMBC community guidelines and standards.
