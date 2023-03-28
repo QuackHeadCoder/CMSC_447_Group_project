@@ -39,6 +39,7 @@
       var player;
       var platforms;
       var cursors;
+      var bombs;
 
       var game = new Phaser.Game(config);
 
@@ -52,84 +53,82 @@
           frameHeight: 48,
         });
       }
-
       function create() {
-        this.add.image(400, 300, "sky");
+  this.add.image(400, 300, "sky");
 
-        platforms = this.physics.add.staticGroup();
+  platforms = this.physics.add.staticGroup();
 
-        platforms.create(400, 568, "ground").setScale(2).refreshBody();
+  platforms.create(400, 568, "ground").setScale(2).refreshBody();
 
-        // platforms.create(600, 400, "ground");
-        // platforms.create(50, 250, "ground");
-        // platforms.create(750, 220, "ground");
+  player = this.physics.add.sprite(100, 450, "player");
+  player.setBounce(0.2);
+  player.setCollideWorldBounds(true);
 
-        // player = this.physics.add.sprite(100, 450, 'dude');
-        // PLAYER
-        player = this.physics.add.sprite(100, 450, "player");
-        player.setBounce(0.2);
-        player.setCollideWorldBounds(true);
-        // END OF PLAYER
+  // Create a group for bombs
+  bombs = this.physics.add.group({
+    key: "bomb",
+    repeat: 2, // Number of bombs to create
+    setXY: { x: 100, y: 0, stepX: 300 }, // Starting position and spacing
+    bounceY: 0.5,
+    collideWorldBounds: true,
+  });
 
+  // Set timer to create new bombs every 1 second edit delay to change this
+  this.time.addEvent({
+    delay: 1000,
+    loop: true,
+    callback: function() {
+      var bomb = bombs.create(Phaser.Math.Between(50, 750), 0, "bomb");
+      bomb.setScale(3);
+      bomb.setBounce(0.5);
+      bomb.setCollideWorldBounds(true);
+    }
+  });
 
-        // Obstable
-        bomb = this.physics.add.sprite(100, 100, "bomb");
-        bomb.setScale(3);
-        bomb.setCollideWorldBounds(true);
-        bomb.setBounce(0.5);
+  this.anims.create({
+    key: "left",
+    frames: this.anims.generateFrameNumbers("player", { start: 0, end: 3 }),
+    frameRate: framerate,
+    repeat: -1,
+  });
 
-        this.anims.create({
-          key: "left",
-          frames: this.anims.generateFrameNumbers("player", { start: 0, end: 3 }),
-          frameRate: framerate,
-          repeat: -1,
-        });
+  this.anims.create({
+    key: "turn",
+    frames: [{ key: "player", frame: 4 }],
+    frameRate: framerate,
+  });
 
-        this.anims.create({
-          key: "turn",
-          frames: [{ key: "player", frame: 4 }],
-          frameRate: framerate,
-        });
+  this.anims.create({
+    key: "right",
+    frames: this.anims.generateFrameNumbers("player", { start: 5, end: 8 }),
+    frameRate: framerate,
+    repeat: -1,
+  });
 
-        this.anims.create({
-          key: "right",
-          frames: this.anims.generateFrameNumbers("player", { start: 5, end: 8 }),
-          frameRate: framerate,
-          repeat: -1,
-        });
+  cursors = this.input.keyboard.createCursorKeys();
+  this.physics.add.collider(player, platforms);
+  this.physics.add.collider(player, bombs, function(player, bomb) {
+    bomb.destroy();
+  });
+}
 
-        cursors = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(player, platforms);
-        //this.physics.add.collider(bomb, platforms);
-        this.physics.add.collider(player, bomb);
-        
-      }
+function update() {
+  if (cursors.left.isDown) {
+    player.setVelocityX(-speed);
+    player.anims.play("left", true);
+  } else if (cursors.right.isDown) {
+    player.setVelocityX(speed);
+    player.anims.play("right", true);
+  } else {
+    player.setVelocityX(0);
+    player.anims.play("turn");
+  }
 
-      function update() {
-        if (cursors.left.isDown) {
-          player.setVelocityX(-speed);
+  this.physics.add.collider(bombs, platforms, function(bomb) {
+    bomb.destroy();
+  });
+}
 
-          player.anims.play("left", true);
-        } else if (cursors.right.isDown) {
-          player.setVelocityX(speed);
-
-          player.anims.play("right", true);
-        } else {
-          player.setVelocityX(0);
-
-          player.anims.play("turn");
-        }
-
-          // Check for collision between bomb and ground
-        this.physics.collide(bomb, platforms, function(bomb, platforms){
-          // Destroy the bomb
-          bomb.destroy();
-        });
-
-        // if (cursors.up.isDown && player.body.touching.down) {
-        //   player.setVelocityY(-330);
-        // }
-      }
     </script>
 
     <!-- END of JS code -->
