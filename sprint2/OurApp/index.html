@@ -100,7 +100,7 @@
 
         cursors = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(player, platforms);
-        this.physics.add.collider(bomb, platforms);
+        //this.physics.add.collider(bomb, platforms);
         this.physics.add.collider(player, bomb);
         
       }
@@ -119,6 +119,12 @@
 
           player.anims.play("turn");
         }
+
+          // Check for collision between bomb and ground
+        this.physics.collide(bomb, platforms, function(bomb, platforms){
+          // Destroy the bomb
+          bomb.destroy();
+        });
 
         // if (cursors.up.isDown && player.body.touching.down) {
         //   player.setVelocityY(-330);
