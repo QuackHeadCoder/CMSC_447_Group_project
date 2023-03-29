@@ -174,13 +174,13 @@
 
       function update() {
         // Player animations based on keyboard inputs
-        if (cursors.left.isDown) {
-          player.setVelocityX(-player_speed*bonus_speed_cale);
+        if (player.scene != undefined && cursors.left.isDown) {
+          player.setVelocityX(-player_speed * bonus_speed_cale);
           player.anims.play("left", true);
-        } else if (cursors.right.isDown) {
-          player.setVelocityX(player_speed*bonus_speed_cale);
+        } else if (player.scene != undefined && cursors.right.isDown) {
+          player.setVelocityX(player_speed * bonus_speed_cale);
           player.anims.play("right", true);
-        } else {
+        } else if (player.scene != undefined) {
           player.setVelocityX(0);
           player.anims.play("turn");
         }
