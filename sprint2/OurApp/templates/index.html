@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS v5.2.1 -->
+
+
+    <!-- Comment below is because we cant actually use it-->
+    <!--<script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>-->
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <title>Skyfall</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <link rel="stylesheet" href = "{{ url_for('static', filename='css/main.css') }}">
+    </style>
+  </head>
+
+
+  <body>
+
+    <header>
+      <script src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
+      <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+          <div class="container">
+          <a class="navbar-brand" href="#">QH</a>
+          <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="collapsibleNavId">
+            <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" href="#" aria-current="page">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Github</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="dropdownId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Creators</a>
+                <div class="dropdown-menu" aria-labelledby="dropdownId">
+                  <a class="dropdown-item" href="#">Christina Dao</a>
+                  <a class="dropdown-item" href="#">Amarjot Gill</a>
+                  <a class="dropdown-item" href="#">Sanjaya Gyawali</a>
+                  <a class="dropdown-item" href="#">Thanh Pham</a>
+                  <a class="dropdown-item" href="#">Jack Wong</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    
+   
+    <main>
+
+      <div class = "buffer-container"></div>
+      <div class = "middle-container">
+        <div class = "gameTBD">
+          Lorem ipsum dolor sit amet,
+          consectetur adipiscing elit,
+          sed do eiusmod tempor incididunt
+          ut labore et dolore magna aliqua.
+          <script src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
+        </div>
+
+        <div class = "table-container">
+          <div class = "description">
+            <table>
+              <tr>
+                <th>How to Play</th>
+              </tr>
+              <tr>
+                <td>1. Suck at it</td>
+              </tr>
+
+            </table>
+          </div>
+
+          <div class = "high-score">
+            <h3>High Score</h3>
+            <p>1. Awesome-o<p>
+          </div>
+        </div>
+      </div>
+      <div class = "buffer-container"> </div>
+      
+  
+    </main>
+    <footer>
+      <!-- place footer here -->
+    </footer>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+      integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
+    </script>
+
+  </body>
+
+
+</html>
