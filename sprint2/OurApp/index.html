@@ -53,8 +53,21 @@
       var bonus;
       var score = 0;
       var scoreText;
+      var gameOver = false;
 
       var game = new Phaser.Game(config);
+      // support functions
+      function hitBomb(player, bomb) {
+        this.physics.pause();
+        player.setTint(0xff0000);
+        player.anims.play("turn");
+        gameOver = true;
+        console.log(this);
+        this.time.removeAllEvents();
+      }
+
+      // end of support functions
+
       function preload() {
         this.load.image("sky", "assets/sky.png");
         this.load.image("ground", "assets/platform.png");
@@ -147,10 +160,7 @@
         this.physics.add.collider(player, platforms);
 
         // Add collision between player and bombs, end game if collision happens
-        this.physics.add.collider(player, bombs, function (player, bomb) {
-          bomb.destroy();
-          player.destroy();
-        });
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
 
         // collision between bonuses and player
         this.physics.add.collider(player, bonuses, function (player, bonus) {
