@@ -23,12 +23,18 @@ main{
     flex:80%;
     padding:2%;
 }
-.gameTBD{
+.game{
+    position:relative;
+    margin-left: auto;
+    margin-right: auto;
     align-self:center;
-    min-height: 600px;
-    min-width: 800px;
-    padding:3%;
     outline: solid 3px black;
+    min-height:600px;
+    min-width:800px;
+}
+.game-canvas{
+    width:800px;
+    height:600px;   
 }
 .table-container{
     display:flex;
@@ -43,6 +49,7 @@ main{
     outline: solid 3px black;
     min-height:400px;
 }
+
 .high-score{
     margin:3%;
     padding:2%;
@@ -50,3 +57,5 @@ main{
     flex:60%;
     min-height:400px;
 }
+
+
