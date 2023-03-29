@@ -32,7 +32,7 @@
       };
       /* CONSTANT */
       // player
-      const player_speed = 300;
+      const player_speed = 200;
       const player_framerate = 30;
 
       // meteor
@@ -40,10 +40,17 @@
 
       /* END OF CONSTANT */
 
+      // CHANGING BONUS
+      var start_reset = 0;
+      var end_reset = 0;
+      var bonus_speed_cale = 1;
+
+      // END OF CHANGING BONUS
       var player;
       var platforms;
       var cursors;
       var bombs;
+      var bonus;
       var score = 0;
       var scoreText;
 
@@ -92,6 +99,20 @@
           },
         });
 
+        // Create bonus group
+        bonuses = this.physics.add.group();
+
+        // Set timer to create new bombs every 1 second edit delay to change this
+        this.time.addEvent({
+          delay: 10000,
+          loop: true,
+          callback: function () {
+            var bonus = bonuses.create(Phaser.Math.Between(50, 750), 0, "star");
+            bonus.setScale(1);
+            bonus.setCollideWorldBounds(true);
+          },
+        });
+
         //player movement animations
         this.anims.create({
           key: "left",
@@ -130,15 +151,34 @@
           bomb.destroy();
           player.destroy();
         });
+
+        // collision between bonuses and player
+        this.physics.add.collider(player, bonuses, function (player, bonus) {
+          bonus.destroy();
+          bonus_speed_cale = bonus_speed_cale * 2;
+          start_reset = Date.now();
+        });
+
+        // reset all CHANGING STUFF. This will start if any of them changes
+        this.time.addEvent({
+          delay: 100,
+          loop: true,
+          callback: function () {
+            if (start_reset != 0 && Date.now() - start_reset >= 5000) {
+              start_reset = 0;
+              bonus_speed_cale = 1;
+            }
+          },
+        });
       }
 
       function update() {
         // Player animations based on keyboard inputs
         if (cursors.left.isDown) {
-          player.setVelocityX(-player_speed);
+          player.setVelocityX(-player_speed*bonus_speed_cale);
           player.anims.play("left", true);
         } else if (cursors.right.isDown) {
-          player.setVelocityX(player_speed);
+          player.setVelocityX(player_speed*bonus_speed_cale);
           player.anims.play("right", true);
         } else {
           player.setVelocityX(0);
@@ -150,6 +190,11 @@
           bomb.destroy();
           score += 1;
           scoreText.setText("Current Score: " + score);
+        });
+
+        // Collision between bonuses and platforms, destroy bonuses and update score
+        this.physics.add.collider(bonuses, platforms, function (bonus) {
+          bonus.destroy();
         });
       }
     </script>
