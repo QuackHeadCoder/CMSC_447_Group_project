@@ -43,7 +43,11 @@
       // CHANGING BONUS
       var start_reset = 0;
       var end_reset = 0;
-      var bonus_speed_cale = 1;
+      var bonus_speed_scale = 1;
+      var bonus_score_scale = 1;
+      var bonus_invincible = false;
+      var bonus_type = ["speed", "score", "invincible"];
+      var cur_bonus = "";
 
       // END OF CHANGING BONUS
       var player;
@@ -58,22 +62,43 @@
       var game = new Phaser.Game(config);
       // support functions
       function hitBomb(player, bomb) {
-        this.physics.pause();
-        player.setTint(0xff0000);
-        player.anims.play("turn");
-        gameOver = true;
-        console.log(this);
-        this.time.removeAllEvents();
+        if (!bonus_invincible) {
+          this.physics.pause();
+          player.setTint(0xff0000);
+          player.anims.play("turn");
+          gameOver = true;
+          this.time.removeAllEvents();
+        } else {
+          bomb.destroy();
+          score += bonus_score_scale;
+          scoreText.setText("Current Score: " + score);
+        }
+      }
+
+      function createBonus(bonusesGroup) {
+        cur_bonus = bonus_type[Phaser.Math.Between(0, 2)];
+        console.log(cur_bonus);
+        var bonus = bonuses.create(Phaser.Math.Between(50, 750), 0, "star");
+        bonus.setCollideWorldBounds(true);
+        if (cur_bonus === "speed") {
+          bonus.setTint(0xff2200);
+        } else if (cur_bonus === "score") {
+          bonus.setTint(0xff002);
+        } else {
+          bonus.setTint(0xff2222);
+        }
+        return bonus;
       }
 
       // end of support functions
 
       function preload() {
-        this.load.image("sky", "assets/sky.png");
-        this.load.image("ground", "assets/platform.png");
-        this.load.image("bomb", "assets/bomb.png");
-        this.load.image("star", "assets/star.png");
-        this.load.spritesheet("player", "assets/dude.png", {
+        console.log(this);
+        this.load.image("sky", "../static/js/assets/sky.png");
+        this.load.image("ground", "../static/js/assets/platform.png");
+        this.load.image("bomb", "../static/js/assets/bomb.png");
+        this.load.image("star", "../static/js/assets/star.png");
+        this.load.spritesheet("player", "../static/js/assets/dude.png", {
           frameWidth: 32,
           frameHeight: 48,
         });
@@ -115,14 +140,12 @@
         // Create bonus group
         bonuses = this.physics.add.group();
 
-        // Set timer to create new bombs every 1 second edit delay to change this
+        // Set timer to create new bonus every 10 second edit delay to change this
         this.time.addEvent({
           delay: 10000,
           loop: true,
           callback: function () {
-            var bonus = bonuses.create(Phaser.Math.Between(50, 750), 0, "star");
-            bonus.setScale(1);
-            bonus.setCollideWorldBounds(true);
+            var bonus = createBonus(bonuses);
           },
         });
 
@@ -164,9 +187,16 @@
 
         // collision between bonuses and player
         this.physics.add.collider(player, bonuses, function (player, bonus) {
+          player.setTint(bonus.tintTopLeft);
           bonus.destroy();
-          bonus_speed_cale = bonus_speed_cale * 2;
           start_reset = Date.now();
+          if (cur_bonus === "speed") {
+            bonus_speed_scale = 2;
+          } else if (cur_bonus === "score") {
+            bonus_score_scale = 2;
+          } else {
+            bonus_invincible = true;
+          }
         });
 
         // reset all CHANGING STUFF. This will start if any of them changes
@@ -176,7 +206,11 @@
           callback: function () {
             if (start_reset != 0 && Date.now() - start_reset >= 5000) {
               start_reset = 0;
-              bonus_speed_cale = 1;
+              bonus_speed_scale = 1;
+              bonus_score_scale = 1;
+              bonus_invincible = false;
+              cur_bonus = "";
+              player.clearTint();
             }
           },
         });
@@ -184,13 +218,13 @@
 
       function update() {
         // Player animations based on keyboard inputs
-        if (player.scene != undefined && cursors.left.isDown) {
-          player.setVelocityX(-player_speed * bonus_speed_cale);
+        if (!gameOver && cursors.left.isDown) {
+          player.setVelocityX(-player_speed * bonus_speed_scale);
           player.anims.play("left", true);
-        } else if (player.scene != undefined && cursors.right.isDown) {
-          player.setVelocityX(player_speed * bonus_speed_cale);
+        } else if (!gameOver && cursors.right.isDown) {
+          player.setVelocityX(player_speed * bonus_speed_scale);
           player.anims.play("right", true);
-        } else if (player.scene != undefined) {
+        } else if (!gameOver) {
           player.setVelocityX(0);
           player.anims.play("turn");
         }
@@ -198,7 +232,7 @@
         // Collision between bombs and platforms, destroy bomb and update score
         this.physics.add.collider(bombs, platforms, function (bomb) {
           bomb.destroy();
-          score += 1;
+          score += bonus_score_scale;
           scoreText.setText("Current Score: " + score);
         });
 
