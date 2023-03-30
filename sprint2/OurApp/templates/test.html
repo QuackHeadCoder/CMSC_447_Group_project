@@ -58,6 +58,7 @@
       var score = 0;
       var scoreText;
       var gameOver = false;
+      var gameOverText;
 
       var game = new Phaser.Game(config);
       // support functions
@@ -67,6 +68,8 @@
           player.setTint(0xff0000);
           player.anims.play("turn");
           gameOver = true;
+          gameOverText = this.add.text(300, 250, 'Game Over!', { font: "30px Courier",
+          fill: "#FFFFFF", });
           this.time.removeAllEvents();
         } else {
           bomb.destroy();
