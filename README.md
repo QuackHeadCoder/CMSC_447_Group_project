@@ -1,1 +1,1 @@
-To run Skyfall have the GoLive feature installed using VScode. Then go live with index.html to run the game and Enjoy!
+To run Skyfall have run the python app.py file and then go to the local hosted server and enjoy!
