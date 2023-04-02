@@ -48,12 +48,16 @@ def index():
 @app.route('/getAllUsers')
 def getAllUsers():
     #return list of all users and their top score
-    pass
+    users = User.query.all()
+    for user in users:
+        print (f"{user.username}, {user.topScore}")
+    return ""
 
 @app.route('/getLeaderboard')
 def getLeaderboard():
     #return top 10 scores from scores table
-    pass
+    scores = Score.query.order_by(Score.score).first(10)
+    return scores
 
 @app.route('/addNewUser', methods = ['POST'])
 def addNewUser():

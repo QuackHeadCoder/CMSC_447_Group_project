@@ -58,4 +58,11 @@ main{
     min-height:400px;
 }
 
+.log-in{
+    margin:3%;
+    padding:2%;
+    outline: solid 3px black;
+    flex:60%;
+    min-height:400px;
+}
 
