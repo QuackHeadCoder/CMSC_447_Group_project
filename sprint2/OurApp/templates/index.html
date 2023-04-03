@@ -6,8 +6,6 @@
     <!-- Bootstrap CSS v5.2.1 -->
 
 
-    <!-- Comment below is because we cant actually use it-->
-    <!--<script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script> -->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
@@ -45,6 +43,13 @@
                   <a class="dropdown-item" href="#">Jack Wong</a>
                 </div>
               </li>
+
+              <div class = "sign-in">
+                <!--Remember to check if statement o see if they are authenticated to show this-->
+                <li class = "nav-item" href = "#">Login</li>
+                <li class = "nav-item" href = "#">Signup</li>
+                <!--Signed in so they show their logged in image instead-->
+              </div>
             </ul>
           </div>
         </div>
@@ -56,8 +61,7 @@
 
       <div class = "buffer-container"></div>
       <div class = "middle-container">
-        <div class = "game">
-          <canvas class = "game-canvas"></canvas>
+        <div class = "game" id = "game">
           <script type = "text/javascript" src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
         </div>
 
@@ -68,7 +72,16 @@
                 <th>How to Play</th>
               </tr>
               <tr>
-                <td>1. Suck at it</td>
+                <td>1. use the arrow keys to move</td>
+              </tr>
+              <tr>
+                <td>2. Dodge the meteors to earn points</td>
+              </tr>
+              <tr>
+                <td>3. Each meteor dodged is one point</td>
+              </tr>
+              <tr>
+                <td>4. You can pickup power ups to improve your chances of surviving</td>
               </tr>
 
             </table>
