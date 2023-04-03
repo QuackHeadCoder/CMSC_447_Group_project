@@ -62,5 +62,13 @@ main{
     padding:2%;
     outline: solid 3px black;
     flex:60%;
-    min-height:350px;
+     min-height:350px;
+}
+
+.log-in{
+    margin:3%;
+    padding:2%;
+    outline: solid 3px black;
+    flex:60%;
+    min-height:400px;
 }
