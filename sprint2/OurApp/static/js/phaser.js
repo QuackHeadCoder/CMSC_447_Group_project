@@ -1,7 +1,11 @@
+
+
+
 var config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
+  parent: 'game',
   physics: {
     default: "arcade",
     arcade: {
@@ -205,6 +209,9 @@ function create() {
 }
 
 function update() {
+  
+  
+
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
     player.setVelocityX(-player_speed * bonus_speed_scale);

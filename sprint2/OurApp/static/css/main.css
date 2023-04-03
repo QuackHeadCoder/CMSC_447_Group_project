@@ -1,38 +1,45 @@
 html{
-    background:rgb(255, 255, 255);
-    background-color: white;
+    background:green;
 }
 .header{
     padding:0%;
 }
 
 main{
-    width:0%;
-    height:0px;
+    width:100%;
+    height:1080px;
     padding-top: 0%;
     display:flex;
 }
 
 
 .buffer-container{
+    margin:2px;
+    outline: solid 3px black;
     background:linear-gradient(25deg, rgb(0, 9, 74), rgb(13, 21, 169));
     flex:10%;
 }
 
 .middle-container{
+    background: linear-gradient(to bottom, rgb(49, 184, 237), skyblue);
     flex:80%;
     padding:2%;
+    outline: solid,3px, black;
 }
 .game{
+    padding:0%;
+    margin:0%;
+    display:grid;
     position:relative;
     margin-left: auto;
     margin-right: auto;
     align-self:center;
     outline: solid 3px black;
-    min-height:600px;
-    min-width:800px;
+    width:800px;
+    height:600px;   
 }
 .game-canvas{
+    align-self:center;
     width:800px;
     height:600px;   
 }
@@ -47,7 +54,7 @@ main{
     padding:2%;
     flex: 40%;
     outline: solid 3px black;
-    min-height:400px;
+    min-height:350px;
 }
 
 .high-score{
@@ -55,7 +62,7 @@ main{
     padding:2%;
     outline: solid 3px black;
     flex:60%;
-    min-height:400px;
+     min-height:350px;
 }
 
 .log-in{
@@ -65,4 +72,3 @@ main{
     flex:60%;
     min-height:400px;
 }
-
