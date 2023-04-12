@@ -1,8 +1,19 @@
+import binascii
+import uuid
+
 from flask import Flask, request, jsonify, json, render_template, url_for, redirect
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from Crypto.Cipher import AES
 
+key = uuid.uuid4().bytes
+"""The encryption key.   Random for this example."""
+
+nonce = uuid.uuid4().bytes
+"""for WHERE criteria to work, we need the encrypted value to be the same
+each time, so use a fixed nonce if we need that feature.
+"""
 app = Flask(__name__)
 CORS(app)
 
@@ -40,6 +51,11 @@ class Score(db.Model):
         return f"username: {self.username}, score: {self.score}"
 
 
+def encrypt(data):
+    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+    data = data + (" " * (16 - (len(data) % 16)))
+    return cipher.encrypt(data.encode("utf-8")).hex()
+
 @app.route('/')
 def index():
     #home page
@@ -76,7 +92,7 @@ def addNewUser():
         
         password = request.form['password']
         newUser = User(username = username,currentLevel = 1, topScore=0)
-        newPassword = Password(username = username, password = password)
+        newPassword = Password(username = username, password = encrypt(password))
         
         db.session.add(newUser)
         db.session.add(newPassword)
@@ -128,7 +144,7 @@ def checkPassword(username, password):
     if(not user):
         return f"user {username} not found"
     userPassword = Password.query.filter_by(username=username).first()
-    if(password == userPassword.password):
+    if(encrypt(password) == userPassword.password):
         return 'Match Found !'
     return 'Username and Password do not match.'
 
