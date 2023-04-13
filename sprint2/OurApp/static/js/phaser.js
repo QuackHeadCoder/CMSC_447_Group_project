@@ -292,19 +292,27 @@ function create() {
   // Add collision between player and bombs, end game if collision happens
   this.physics.add.collider(player, bombs.get_meteors(), hitBomb, null, this);
 
-  // collision between bonuses and player
-  this.physics.add.collider(player, bonuses, function (player, bonus) {
-    player.setTint(bonus.tintTopLeft);
-    bonus.destroy();
-    start_reset = Date.now();
-    if (cur_bonus === "speed") {
-      bonus_speed_scale = 2;
-    } else if (cur_bonus === "score") {
-      bonus_score_scale = 2;
-    } else {
-      bonus_invincible = true;
-    }
-  });
+// add text object to the game
+let text = this.add.text(400, 300, '', { font: "30px Courier", fill: "#FFFFFF", });
+text.setOrigin(0.5);
+
+// collision between bonuses and player
+this.physics.add.collider(player, bonuses, function (player, bonus) {
+  player.setTint(bonus.tintTopLeft);
+  bonus.destroy();
+  start_reset = Date.now();
+  if (cur_bonus === "speed") {
+    bonus_speed_scale = 2;
+    text.setText('Speed bonus activated!');
+  } else if (cur_bonus === "score") {
+    bonus_score_scale = 2;
+    text.setText('Score bonus activated!');
+  } else {
+    bonus_invincible = true;
+    text.setText('Invincibility bonus activated!');
+  }
+});
+
 
   // reset all CHANGING STUFF. This will start if any of them changes
   this.time.addEvent({
@@ -317,6 +325,7 @@ function create() {
         bonus_score_scale = 1;
         bonus_invincible = false;
         cur_bonus = "";
+        text.setText('');
         player.clearTint();
       }
     },
