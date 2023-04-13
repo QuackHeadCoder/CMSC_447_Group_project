@@ -46,10 +46,10 @@ function meteors(scene, meteor_key) {
   };
 
   const get_angle = () => {
-    return Object.create({
+    return {
       min_angle: this.min_angle,
       max_angle: this.max_angle,
-    });
+    };
   };
   const set_angle = (angle = { min_angle: 0, max_angle: 0 }) => {
     this.max_angle = angle.max_angle;
@@ -71,7 +71,7 @@ function meteors(scene, meteor_key) {
       );
       meteor.angle = Phaser.Math.Between(this.min_angle, this.max_angle);
       meteor.setScale(Phaser.Math.FloatBetween(1, meteor_max_scale));
-      meteor.setBounce(0.5);
+      // meteor.setBounce(0.5);
       meteor.setCollideWorldBounds(true);
     }
   };
@@ -221,25 +221,23 @@ function create() {
   // Create a group for bombs
   // bombs = this.physics.add.group();
   bombs = meteors(this, "bomb");
-  bombs.set_angle({min_angle: -45, max_angle:45});
-  bombs.set_meteors_number(5);
+  bombs.set_angle({ min_angle: -30, max_angle: 30 });
+  bombs.set_meteors_number(1);
 
   // Set timer to create new bombs every 1 second edit delay to change this
   this.time.addEvent({
     delay: 1000,
     loop: true,
     callback: function () {
-      // for (let index = 0; index < bomb_numbers; index++) {
-      //   var bomb = bombs.create(
-      //     Phaser.Math.Between(0, 750),
-      //     Phaser.Math.Between(0, 100),
-      //     "bomb"
-      //   );
-      //   bomb.setScale(Phaser.Math.FloatBetween(1, meteor_max_scale));
-      //   bomb.setBounce(0.5);
-      //   bomb.setCollideWorldBounds(true);
-      // }
       bombs.create_meteor(meteor_max_scale);
+    },
+  });
+  // test increase bomb number after every 5 seconds
+  this.time.addEvent({
+    delay: 5000,
+    loop: true,
+    callback: function () {
+      bombs.set_meteors_number(bombs.get_meteor_numbers() + 1);
     },
   });
 
@@ -333,15 +331,6 @@ function create() {
   this.physics.add.collider(bonuses, platforms, function (bonus) {
     bonus.destroy();
   });
-
-  // this.time.addEvent({
-  //   delay: 5000,
-  //   loop: true,
-  //   callbackScope: this,
-  //   callback: function () {
-  //     this.physics.world.gravity.set(500, 300);
-  //   },
-  // });
 }
 
 function update() {
@@ -357,14 +346,27 @@ function update() {
     player.anims.play("turn");
   }
 
-  // Collision between bombs and platforms, destroy bomb and update score
-  // this.physics.add.collider(bombs, platforms, function (bomb) {
-  //   bomb.destroy();
-  //   score += bonus_score_scale;
-  //   scoreText.setText("Current Score: " + score);
-  // });
-  // scoreText.setText("Current Score: " + score);
-
   // Collision between bonuses and platforms, destroy bonuses and update score
   bombs.move_meteor(500);
+
+  // Check if the meteors hit the sides, act as hitting platform
+  bombs
+    .get_meteors()
+    .getChildren()
+    .forEach((bomb) => {
+      if (
+        !this.physics.world.bounds.contains(
+          bomb.x + bomb.displayWidth / 2 + 1,
+          bomb.y
+        ) ||
+        !this.physics.world.bounds.contains(
+          bomb.x - bomb.displayWidth / 2 - 1,
+          bomb.y
+        )
+      ) {
+        bomb.destroy();
+        score += bonus_score_scale;
+        scoreText.setText("Current Score: " + score);
+      }
+    });
 }
