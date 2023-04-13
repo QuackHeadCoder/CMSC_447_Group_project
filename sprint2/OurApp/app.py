@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, json, render_template, url_for, redir
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from Crypto.Cipher import AES
+# from Crypto.Cipher import AES
 
 key = uuid.uuid4().bytes
 """The encryption key.   Random for this example."""
@@ -51,10 +51,10 @@ class Score(db.Model):
         return f"username: {self.username}, score: {self.score}"
 
 
-def encrypt(data):
-    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
-    data = data + (" " * (16 - (len(data) % 16)))
-    return cipher.encrypt(data.encode("utf-8")).hex()
+# def encrypt(data):
+#     cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+#     data = data + (" " * (16 - (len(data) % 16)))
+#     return cipher.encrypt(data.encode("utf-8")).hex()
 
 @app.route('/')
 def index():
