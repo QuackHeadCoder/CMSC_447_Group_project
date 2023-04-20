@@ -399,7 +399,8 @@ function preload() {
   this.load.image("ground", "../static/js/assets/platform.png");
   this.load.image("bomb", "../static/js/assets/bomb.png");
   this.load.image("star", "../static/js/assets/star.png");
-  this.load.image("night","../static/js/assets/level2.png");
+  this.load.image("night","../static/js/assets/level2night.webp");
+  this.load.image("level2ground","../static/js/assets/emptyplatform.png");
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -570,6 +571,18 @@ function create() {
 }
 
 function update() {
+  
+  if(level2){
+    nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
+      font: "30px Courier",
+      fill: "#FFFFFF",
+    });
+    
+    this.time.delayedCall(1000, function() {
+      this.scene.start("level2Scene");
+    }, [], this);
+    
+  }
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
     mplayer.moveX(mscore.get_speed_scale(), 0);
@@ -590,53 +603,147 @@ function update() {
   mscore.set_score(
     mscore.get_score() + bombs.sideHits() * mscore.get_score_scale()
   );
-  scoreText.setText("Current Score: " + mscore.get_score());
+  if(mscore.get_score() == 10){
+    level2 = true;
+  }
 }
-/*
+
 var level2Scene = new Phaser.Scene("level2Scene");
 
 level2Scene.create = function() {
-
-  console.log("running scene2");
-  this.add.image(400, 300, "night");
+  this.time.timeScale = 1;
+  this.add.image(400, 300, "night").setScale(2);
     // Display Score at Start of Game
     scoreText = this.add.text(20, 20, "", {
       font: "16px Courier",
       fill: "#FFFFFF",
     });
-    scoreText.setText("Current Score: " + score);
-    // Create ground platform
-  platforms = this.physics.add.staticGroup();
-  platforms.create(400, 568, "ground").setScale(2).refreshBody();
+    this.player = mplayer;
+    scoreText.setText("Current Score: " + mscore.get_score());
 
-  // Create player
-  player = this.physics.add.sprite(16, 450, "player");
-  player.setBounce(0.2);
-  player.setCollideWorldBounds(true);
-   // Add collision between player and ground platform
-   this.physics.add.collider(player, platforms);
+    platforms = this.physics.add.staticGroup();
+    platforms.create(400, 725, "level2ground").setScale(2).refreshBody();
+    platforms.getChildren()[0].setOffset(0, 12);
+    mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
+    // level2 has increase player speed
+    mplayer.set_speed(500);
+    bombs.set_meteors(this.physics.add.group());
+    bombs.set_angle({ min_angle: -10, max_angle: 10 });
+    bombs.set_meteors_number(6);
+
+    // Create bonus group
+    mbonuses.set_bonuses(this.physics.add.group());
+    mbonuses.set_angle({ min_angle: -30, max_angle: 30 });
+
+    this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: function () {
+        bombs.create_meteor(meteor_max_scale);
+      },
+    });
+
+    this.time.addEvent({
+      delay: 5000,
+      loop: true,
+      callback: function () {
+        mbonuses.createBonus();
+      },
+    });
+
+     // Add collision between player and bombs, end game if collision happens
+  this.physics.add.collider(
+    mplayer.get_player(),
+    bombs.get_meteors(),
+    hitBomb,
+    null,
+    this
+  );
 
    cursors = this.input.keyboard.createCursorKeys();
 
+   // Add collision between player and ground platform
+  this.physics.add.collider(mplayer.get_player(), platforms);
+    // Collision between bombs and platforms, destroy bomb and update score
+    this.physics.add.collider(bombs.get_meteors(), platforms, function (bomb) {
+      bomb.destroy();
+      mscore.increase_score();
+      scoreText.setText("Current Score: " + mscore.get_score());
+    });
+
+     // add text object to the game
+    let text = this.add.text(400, 300, "", {
+      font: "30px Courier",
+      fill: "#FFFFFF",
+    });
+    text.setOrigin(0.5);
+    // collision between bonuses and player
+  this.physics.add.collider(
+    mplayer.get_player(),
+    mbonuses.get_bonuses(),
+    function (player, bonus) {
+      player.setTint(bonus.tintTopLeft);
+      bonus.destroy();
+      start_reset = Date.now();
+      if (mbonuses.get_cur_bonus() === "speed") {
+        // bonus_speed_scale = 2;
+        mscore.set_speed_scale(2);
+        text.setText("Speed bonus activated!");
+      } else if (mbonuses.get_cur_bonus() === "score") {
+        // bonus_score_scale = 2;
+        mscore.set_score_scale(2);
+        text.setText("Score bonus activated!");
+      } else {
+        // bonus_invincible = true;
+        mscore.set_invincible(true);
+        text.setText("Invincibility bonus activated!");
+      }
+    }
+  );
+
+  this.time.addEvent({
+    delay: 10,
+    loop: true,
+    callback: function () {
+      if (start_reset != 0 && Date.now() - start_reset >= 5000) {
+        start_reset = 0;
+        mscore.reset();
+        mbonuses.set_cur_bonus("");
+        text.setText("");
+        mplayer.get_player().clearTint();
+      }
+    },
+  });
+
+  this.physics.add.collider(
+    mbonuses.get_bonuses(),
+    platforms,
+    function (bonus) {
+      bonus.destroy();
+    }
+  );
 
 };
-}
 
 level2Scene.update = function() {
-  // Player animations based on keyboard inputs
-  if (!gameOver && cursors.left.isDown) {
-    player.setVelocityX(-player_speed * bonus_speed_scale);
-    player.anims.play("left", true);
-  } else if (!gameOver && cursors.right.isDown) {
-    player.setVelocityX(player_speed * bonus_speed_scale);
-    player.anims.play("right", true);
-  } else if (!gameOver) {
-    player.setVelocityX(0);
-    player.anims.play("turn");
-  }
+
+    // Player animations based on keyboard inputs
+    if (!gameOver && cursors.left.isDown) {
+      mplayer.moveX(mscore.get_speed_scale(), 0);
+      mplayer.get_player().anims.play("left", true);
+    } else if (!gameOver && cursors.right.isDown) {
+      mplayer.moveX(0, mscore.get_speed_scale());
+      mplayer.get_player().anims.play("right", true);
+    } else if (!gameOver) {
+      mplayer.moveX(0, 0);
+      mplayer.get_player().anims.play("turn");
+    }
+
+    mbonuses.move_bonus(300);
+    bombs.move_meteor(700);
+
 }
 
 var game = new Phaser.Game(config);
 
 game.scene.add("level2Scene", level2Scene);
-*/
