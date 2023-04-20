@@ -150,8 +150,9 @@ var score = 0;
 var scoreText;
 var gameOver = false;
 var gameOverText;
+var level2 = false;
+var nextLevelText = "";
 
-var game = new Phaser.Game(config);
 // support functions
 function hitBomb(player, bomb) {
   if (!bonus_invincible) {
@@ -194,11 +195,13 @@ function preload() {
   this.load.image("ground", "../static/js/assets/platform.png");
   this.load.image("bomb", "../static/js/assets/bomb.png");
   this.load.image("star", "../static/js/assets/star.png");
+  this.load.image("night","../static/js/assets/level2.png");
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
-  });
+  });  
 }
+
 function create() {
   this.add.image(400, 300, "sky");
 
@@ -256,33 +259,32 @@ function create() {
     },
   });
 
-  //player movement animations
-  this.anims.create({
-    key: "left",
-    frames: this.anims.generateFrameNumbers("player", {
-      start: 0,
-      end: 3,
-    }),
-    frameRate: player_framerate,
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "turn",
-    frames: [{ key: "player", frame: 4 }],
-    frameRate: player_framerate,
-  });
-
-  this.anims.create({
-    key: "right",
-    frames: this.anims.generateFrameNumbers("player", {
-      start: 5,
-      end: 8,
-    }),
-    frameRate: player_framerate,
-    repeat: -1,
-  });
-
+     //player movement animations
+     this.anims.create({
+      key: "left",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: player_framerate,
+      repeat: -1,
+    });
+  
+    this.anims.create({
+      key: "turn",
+      frames: [{ key: "player", frame: 4 }],
+      frameRate: player_framerate,
+    });
+  
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers("player", {
+        start: 5,
+        end: 8,
+      }),
+      frameRate: player_framerate,
+      repeat: -1,
+    });
   // Initialize keyboard inputs
   cursors = this.input.keyboard.createCursorKeys();
 
@@ -343,6 +345,9 @@ this.physics.add.collider(player, bonuses, function (player, bonus) {
 }
 
 function update() {
+  if(level2){
+    this.scene.start("level2Scene");
+  }else{
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
     player.setVelocityX(-player_speed * bonus_speed_scale);
@@ -376,6 +381,81 @@ function update() {
         bomb.destroy();
         score += bonus_score_scale;
         scoreText.setText("Current Score: " + score);
+        if(score >= 10){
+          level2 = true;
+        }
       }
     });
+  }
 }
+
+var level2Scene = new Phaser.Scene("level2Scene");
+
+level2Scene.create = function() {
+
+  console.log("running scene2");
+  this.add.image(400, 300, "night");
+    // Display Score at Start of Game
+    scoreText = this.add.text(20, 20, "", {
+      font: "16px Courier",
+      fill: "#FFFFFF",
+    });
+    scoreText.setText("Current Score: " + score);
+    // Create ground platform
+  platforms = this.physics.add.staticGroup();
+  platforms.create(400, 568, "ground").setScale(2).refreshBody();
+
+  // Create player
+  player = this.physics.add.sprite(16, 450, "player");
+  player.setBounce(0.2);
+  player.setCollideWorldBounds(true);
+   // Add collision between player and ground platform
+   this.physics.add.collider(player, platforms);
+
+   cursors = this.input.keyboard.createCursorKeys();
+
+
+};
+
+level2Scene.update = function() {
+  // Player animations based on keyboard inputs
+  if (!gameOver && cursors.left.isDown) {
+    player.setVelocityX(-player_speed * bonus_speed_scale);
+    player.anims.play("left", true);
+  } else if (!gameOver && cursors.right.isDown) {
+    player.setVelocityX(player_speed * bonus_speed_scale);
+    player.anims.play("right", true);
+  } else if (!gameOver) {
+    player.setVelocityX(0);
+    player.anims.play("turn");
+  }
+
+  bombs.move_meteor(500);
+
+  // Check if the meteors hit the sides, act as hitting platform
+  bombs
+    .get_meteors()
+    .getChildren()
+    .forEach((bomb) => {
+      if (
+        !this.physics.world.bounds.contains(
+          bomb.x + bomb.displayWidth / 2 + 1,
+          bomb.y
+        ) ||
+        !this.physics.world.bounds.contains(
+          bomb.x - bomb.displayWidth / 2 - 1,
+          bomb.y
+        )
+      ) {
+        bomb.destroy();
+        score += bonus_score_scale;
+        scoreText.setText("Current Score: " + score);
+        if(score >= 10){
+          level2 = true;
+        }
+      }
+    });
+};
+var game = new Phaser.Game(config);
+
+game.scene.add("level2Scene", level2Scene);
