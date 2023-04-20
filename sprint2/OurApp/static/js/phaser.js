@@ -570,9 +570,6 @@ function create() {
 }
 
 function update() {
-  if(level2){
-    this.scene.start("level2Scene");
-  }else{
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
     mplayer.moveX(mscore.get_speed_scale(), 0);
@@ -595,7 +592,7 @@ function update() {
   );
   scoreText.setText("Current Score: " + mscore.get_score());
 }
-
+/*
 var level2Scene = new Phaser.Scene("level2Scene");
 
 level2Scene.create = function() {
@@ -623,6 +620,7 @@ level2Scene.create = function() {
 
 
 };
+}
 
 level2Scene.update = function() {
   // Player animations based on keyboard inputs
@@ -636,34 +634,9 @@ level2Scene.update = function() {
     player.setVelocityX(0);
     player.anims.play("turn");
   }
-
-  bombs.move_meteor(500);
-
-  // Check if the meteors hit the sides, act as hitting platform
-  bombs
-    .get_meteors()
-    .getChildren()
-    .forEach((bomb) => {
-      if (
-        !this.physics.world.bounds.contains(
-          bomb.x + bomb.displayWidth / 2 + 1,
-          bomb.y
-        ) ||
-        !this.physics.world.bounds.contains(
-          bomb.x - bomb.displayWidth / 2 - 1,
-          bomb.y
-        )
-      ) {
-        bomb.destroy();
-        score += bonus_score_scale;
-        scoreText.setText("Current Score: " + score);
-        if(score >= 10){
-          level2 = true;
-        }
-      }
-    });
-};
 }
+
 var game = new Phaser.Game(config);
 
 game.scene.add("level2Scene", level2Scene);
+*/
