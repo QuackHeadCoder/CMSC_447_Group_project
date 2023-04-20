@@ -392,7 +392,7 @@ function hitBomb(player, bomb) {
 }
 
 // end of support functions
-
+/*Preload anything needed for all scenes here */
 function preload() {
   console.log(this);
   this.load.image("sky", "../static/js/assets/sky.png");
@@ -406,7 +406,7 @@ function preload() {
     frameHeight: 48,
   });  
 }
-
+/*LEVEL 1 CODE BEGINS */
 function create() {
   this.add.image(400, 300, "sky");
   mscore = score();
@@ -439,7 +439,9 @@ function create() {
     delay: 1000,
     loop: true,
     callback: function () {
-      bombs.create_meteor(meteor_max_scale);
+      if(!level2){
+        bombs.create_meteor(meteor_max_scale);
+      }
     },
   });
   // test increase bomb number after every 5 seconds
@@ -463,7 +465,9 @@ function create() {
     delay: 5000,
     loop: true,
     callback: function () {
-      mbonuses.createBonus();
+      if(!level2){
+        mbonuses.createBonus();
+      }
     },
   });
 
@@ -545,6 +549,7 @@ function create() {
     delay: 10,
     loop: true,
     callback: function () {
+      if(!level2){
       if (start_reset != 0 && Date.now() - start_reset >= 5000) {
         start_reset = 0;
         mscore.reset();
@@ -552,6 +557,7 @@ function create() {
         text.setText("");
         mplayer.get_player().clearTint();
       }
+    }
     },
   });
   // Collision between bombs and platforms, destroy bomb and update score
@@ -571,14 +577,14 @@ function create() {
 }
 
 function update() {
-  
   if(level2){
+    //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
       font: "30px Courier",
       fill: "#FFFFFF",
     });
     
-    this.time.delayedCall(1000, function() {
+    this.time.delayedCall(2000, function() {
       this.scene.start("level2Scene");
     }, [], this);
     
@@ -607,7 +613,9 @@ function update() {
     level2 = true;
   }
 }
+/* LEVEL 1 CODE ENDS */
 
+/* LEVEL 2 CODE BEGINS*/
 var level2Scene = new Phaser.Scene("level2Scene");
 
 level2Scene.create = function() {
@@ -634,7 +642,7 @@ level2Scene.create = function() {
     // Create bonus group
     mbonuses.set_bonuses(this.physics.add.group());
     mbonuses.set_angle({ min_angle: -30, max_angle: 30 });
-
+    // time event for creating meteor
     this.time.addEvent({
       delay: 1000,
       loop: true,
@@ -642,7 +650,7 @@ level2Scene.create = function() {
         bombs.create_meteor(meteor_max_scale);
       },
     });
-
+    // time event are creating bonuses
     this.time.addEvent({
       delay: 5000,
       loop: true,
@@ -651,14 +659,14 @@ level2Scene.create = function() {
       },
     });
 
-     // Add collision between player and bombs, end game if collision happens
-  this.physics.add.collider(
-    mplayer.get_player(),
-    bombs.get_meteors(),
-    hitBomb,
-    null,
-    this
-  );
+  // Add collision between player and bombs, end game if collision happens
+    this.physics.add.collider(
+      mplayer.get_player(),
+      bombs.get_meteors(),
+      hitBomb,
+      null,
+      this
+    );
 
    cursors = this.input.keyboard.createCursorKeys();
 
@@ -739,8 +747,13 @@ level2Scene.update = function() {
       mplayer.get_player().anims.play("turn");
     }
 
+    // speeds up how fast the objects fall
     mbonuses.move_bonus(300);
     bombs.move_meteor(700);
+    
+    mscore.set_score(
+      mscore.get_score() + bombs.sideHits() * mscore.get_score_scale()
+    );
 
 }
 
