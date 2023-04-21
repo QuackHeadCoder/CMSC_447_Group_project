@@ -584,7 +584,7 @@ function update() {
       fill: "#FFFFFF",
     });
     
-    this.time.delayedCall(2000, function() {
+    this.time.delayedCall(1500, function() {
       this.scene.start("level2Scene");
     }, [], this);
     
@@ -638,6 +638,7 @@ level2Scene.create = function() {
     bombs.set_meteors(this.physics.add.group());
     bombs.set_angle({ min_angle: -10, max_angle: 10 });
     bombs.set_meteors_number(6);
+    mplayer.get_player().setGravityY(300);
 
     // Create bonus group
     mbonuses.set_bonuses(this.physics.add.group());
@@ -660,6 +661,7 @@ level2Scene.create = function() {
     });
 
   // Add collision between player and bombs, end game if collision happens
+
     this.physics.add.collider(
       mplayer.get_player(),
       bombs.get_meteors(),
@@ -667,6 +669,13 @@ level2Scene.create = function() {
       null,
       this
     );
+ 
+
+    this.anims.create({
+      key: "up",
+      frames: [{ key: mplayer.get_key(), frame: 4 }],
+      frameRate: mplayer.get_frame_rate(),
+    });
 
    cursors = this.input.keyboard.createCursorKeys();
 
@@ -742,6 +751,9 @@ level2Scene.update = function() {
     } else if (!gameOver && cursors.right.isDown) {
       mplayer.moveX(0, mscore.get_speed_scale());
       mplayer.get_player().anims.play("right", true);
+    } else if (!gameOver && cursors.up.isDown && (mplayer.get_player().body.onFloor() || mplayer.get_player().body.touching.down)) {
+       mplayer.get_player().setVelocityY(-500);
+      mplayer.get_player().anims.play("up", true);
     } else if (!gameOver) {
       mplayer.moveX(0, 0);
       mplayer.get_player().anims.play("turn");
@@ -749,11 +761,7 @@ level2Scene.update = function() {
 
     // speeds up how fast the objects fall
     mbonuses.move_bonus(300);
-    bombs.move_meteor(700);
-    
-    mscore.set_score(
-      mscore.get_score() + bombs.sideHits() * mscore.get_score_scale()
-    );
+    bombs.move_meteor(600);
 
 }
 
