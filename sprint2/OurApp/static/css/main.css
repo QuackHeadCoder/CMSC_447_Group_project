@@ -1,5 +1,5 @@
 html{
-    background:green;
+    background:linear-gradient(to bottom, rgb(15, 114, 15), rgb(6, 113, 6));
 }
 .header{
     padding:0%;
@@ -21,7 +21,7 @@ main{
 }
 
 .middle-container{
-    background: linear-gradient(to bottom, rgb(49, 184, 237), skyblue);
+    background: linear-gradient(to bottom, rgb(42, 154, 198), rgb(14, 111, 150));
     flex:80%;
     padding:2%;
     outline: solid,3px, black;
@@ -53,8 +53,15 @@ main{
     margin:3%;
     padding:2%;
     flex: 40%;
-    outline: solid 3px black;
     min-height:350px;
+    background: rgb(24, 133, 223);
+    font-size: 14;
+}
+
+.outer-descript{
+    outline: solid 3px black;
+    margin:3%;
+    background:linear-gradient(to bottom right,black,rgb(24, 133, 223));
 }
 
 .high-score{
@@ -70,5 +77,5 @@ main{
     padding:2%;
     outline: solid 3px black;
     flex:60%;
-    min-height:400px;
+    min-height:350px;
 }
