@@ -585,6 +585,7 @@ function update() {
     });
     
     this.time.delayedCall(1500, function() {
+      nextLevelText = "";
       this.scene.start("level2Scene");
     }, [], this);
     
@@ -637,7 +638,7 @@ level2Scene.create = function() {
     mplayer.set_speed(500);
     bombs.set_meteors(this.physics.add.group());
     bombs.set_angle({ min_angle: -10, max_angle: 10 });
-    bombs.set_meteors_number(6);
+    bombs.set_meteors_number(3);
     mplayer.get_player().setGravityY(300);
 
     // Create bonus group
