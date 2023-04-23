@@ -401,6 +401,7 @@ function preload() {
   this.load.image("star", "../static/js/assets/star.png");
   this.load.image("night","../static/js/assets/level2night.webp");
   this.load.image("level2ground","../static/js/assets/emptyplatform.png");
+  this.load.image("level2platform","../static/js/assets/level2platform.png");
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -616,7 +617,7 @@ function update() {
   mscore.set_score(
     mscore.get_score() + bombs.sideHits() * mscore.get_score_scale()
   );
-  if(mscore.get_score() == 10){
+  if(mscore.get_score() == 100){
     level2 = true;
   }
 }
@@ -639,13 +640,20 @@ level2Scene.create = function() {
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 725, "level2ground").setScale(2).refreshBody();
     platforms.getChildren()[0].setOffset(0, 12);
+
+    level2platforms = this.physics.add.staticGroup();
+    level2platforms.create(0, 300, "level2platform").setScale(1).refreshBody();
+    level2platforms.create(750, 300, "level2platform").setScale(1).refreshBody();
+    level2platforms.getChildren()[0].setOffset(0, 12);
+
     mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
     // level2 has increase player speed
     mplayer.set_speed(500);
     bombs.set_meteors(this.physics.add.group());
     bombs.set_angle({ min_angle: -10, max_angle: 10 });
-    bombs.set_meteors_number(3);
+    bombs.set_meteors_number(4);
     mplayer.get_player().setGravityY(300);
+    mplayer.get_player().setCollideWorldBounds(true);
 
     // Create bonus group
     mbonuses.set_bonuses(this.physics.add.group());
@@ -688,6 +696,8 @@ level2Scene.create = function() {
 
    // Add collision between player and ground platform
   this.physics.add.collider(mplayer.get_player(), platforms);
+  this.physics.add.collider(mplayer.get_player(), level2platforms);
+  this.physics.add.collider(mbonuses.get_bonuses(), level2platforms);
     // Collision between bombs and platforms, destroy bomb and update score
     this.physics.add.collider(bombs.get_meteors(), platforms, function (bomb) {
       bomb.destroy();
@@ -759,7 +769,7 @@ level2Scene.update = function() {
       mplayer.moveX(0, mscore.get_speed_scale());
       mplayer.get_player().anims.play("right", true);
     } else if (!gameOver && cursors.up.isDown && (mplayer.get_player().body.onFloor() || mplayer.get_player().body.touching.down)) {
-       mplayer.get_player().setVelocityY(-500);
+       mplayer.get_player().setVelocityY(-600);
       mplayer.get_player().anims.play("up", true);
     } else if (!gameOver) {
       mplayer.moveX(0, 0);
