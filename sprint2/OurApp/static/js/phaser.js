@@ -404,10 +404,16 @@ function preload() {
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
-  });  
+  });
+  this.load.audio("gaming_music",["../static/js/assets/hey_ya.mp3"]);
 }
 /*LEVEL 1 CODE BEGINS */
 function create() {
+  //music
+  music = this.sound.add("gaming_music",{loop:true,volume:0.5});
+  music.play();
+
+
   this.add.image(400, 300, "sky");
   mscore = score();
   // Display Score at Start of Game
