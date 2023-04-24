@@ -7,7 +7,7 @@ html{
 
 main{
     width:100%;
-    height:1080px;
+    height:1280px;
     padding-top: 0%;
     display:flex;
 }
@@ -49,33 +49,51 @@ main{
     min-height:400px;
 }
 
+
+.outer-descript{
+    flex:100%;
+    outline: solid 3px black;
+    margin:3%;
+    background:linear-gradient(to bottom right,black,rgb(31, 179, 212),rgb(8, 144, 142),black);
+    background-size: 400% 400%;
+    min-height:356px;
+    min-width:356px;
+    animation: gradient 5s ease infinite;
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
 .description{
     margin:3%;
     padding:2%;
-    flex: 40%;
     min-height:350px;
     background: rgb(24, 133, 223);
     font-size: 14;
+    outline:solid 1px black;
 }
-
-.outer-descript{
-    outline: solid 3px black;
-    margin:3%;
-    background:linear-gradient(to bottom right,black,rgb(24, 133, 223));
-}
-
 .high-score{
     margin:3%;
     padding:2%;
-    outline: solid 3px black;
-    flex:60%;
-     min-height:350px;
+    min-height:350px;
+    background: rgb(24, 133, 223);
+    outline:solid 1px black;
 }
 
 .log-in{
     margin:3%;
     padding:2%;
-    outline: solid 3px black;
-    flex:60%;
     min-height:350px;
+    min-width:350px;
+    background: rgb(24, 133, 223);
+    outline:solid 1px black;
 }
