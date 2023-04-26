@@ -44,12 +44,6 @@
                 </div>
               </li>
 
-              <div class = "sign-in">
-                <!--Remember to check if statement o see if they are authenticated to show this-->
-                <li class = "nav-item" href = "#">Login</li>
-                <li class = "nav-item" href = "#">Signup</li>
-                <!--Signed in so they show their logged in image instead-->
-              </div>
             </ul>
           </div>
         </div>
@@ -89,17 +83,43 @@
             </div>
           </div>
           <div class = "outer-descript">
+            
             <div class = "log-in">
+              {% if user.is_authenticated %}
+                <h3>Hello {{ user.username}}!</h3>
+                <p>level: {{ user.currentLevel}}</p>
+                <p>High Score: {{user.topScore}}</p>
+                <form method="POST" action = "/">
+                  <input type="submit" name = "logout" value="Sign Out">
+                </form>
+              {%else%}
               <h3>CREATE/LOGIN</h3>
-              <form>
+              <form method = "POST" action = "/" >
                   <label for="username">Username:</label><br>
                   <input type="text" style = "background-color:#eec7fe" id="username" name="username" required><br>
                   <label for="password">Password:</label><br>
                   <input type="text" style = "background-color:#eec7fe" id="password" name="password" required><br/>
                   <br/>
-                  <input type="submit" value="Create New User">
-                  <input type="submit" value="Login">
+                  <input type="submit" name = "create_new_user" value="Create New User">
+                  <input type="submit" name = "login" value="Login">
+                  <br></br>
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                  {%if messages %}
+                    {%for category,message in messages %}
+                      {%if category == 'error'%}
+                        <div class = "alert alert-danger alter-dismissable fade show" role = "alert">
+                          {{ message }}
+                        </div>
+                      {%else%}
+                        <div class = "alert alert-success alter-dismissable fade show" role = "alert">
+                          {{ message }}
+                        </div>
+                      {%endif%}
+                    {%endfor%}
+                  {%endif%}
+                  {%endwith%}
               </form>
+              {%endif%}
             </div>
           </div>
 
