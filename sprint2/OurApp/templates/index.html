@@ -52,91 +52,90 @@
     
    
     <main>
-
-      <div class = "buffer-container"></div>
-      <div class = "middle-container">
-        <div class = "title-container">
-          <h1 class="neon" data-text="Sky Fall">Sky Fall</h1>
-          <div class="gradient"></div>
-          <div class="spotlight"></div>
-        </div>
-        <div class = "game" id = "game">
-          <script type = "text/javascript" src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
-        </div>
-
-        <div class = "table-container">
-          <div class = "outer-descript">
-            <div class = "description">
-              <table>
-                <tr>
-                  <th>How to Play</th>
-                </tr>
-                <tr>
-                  <td>1. use the arrow keys to move</td>
-                </tr>
-                <tr>
-                  <td>2. Dodge the meteors to earn points</td>
-                </tr>
-                <tr>
-                  <td>3. Each meteor dodged is one point</td>
-                </tr>
-                <tr>
-                  <td>4. You can pickup power ups to improve your chances of surviving</td>
-                </tr>
-
-              </table>
-            </div>
+        <div class = "buffer-container"></div>
+        <div class = "middle-container">
+          <div class = "title-container">
+            <h1 class="neon" data-text="Sky Fall">Sky Fall</h1>
+            <div class="gradient"></div>
+            <div class="spotlight"></div>
           </div>
-          <div class = "outer-descript">
-            
-            <div class = "log-in">
-              {% if user.is_authenticated %}
-                <h3>Hello {{ user.username}}!</h3>
-                <p>level: {{ user.currentLevel}}</p>
-                <p>High Score: {{user.topScore}}</p>
-                <form method="POST" action = "/">
-                  <input type="submit" name = "logout" value="Sign Out">
+          <div class = "game" id = "game">
+            <script type = "text/javascript" src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
+          </div>
+
+          <div class = "table-container">
+            <div class = "outer-descript">
+              <div class = "description">
+                <table>
+                  <tr>
+                    <th>How to Play</th>
+                  </tr>
+                  <tr>
+                    <td>1. use the arrow keys to move</td>
+                  </tr>
+                  <tr>
+                    <td>2. Dodge the meteors to earn points</td>
+                  </tr>
+                  <tr>
+                    <td>3. Each meteor dodged is one point</td>
+                  </tr>
+                  <tr>
+                    <td>4. You can pickup power ups to improve your chances of surviving</td>
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+            <div class = "outer-descript">
+              
+              <div class = "log-in">
+                {% if user.is_authenticated %}
+                  <h3>Hello {{ user.username}}!</h3>
+                  <p>level: {{ user.currentLevel}}</p>
+                  <p>High Score: {{user.topScore}}</p>
+                  <form method="POST" action = "/">
+                    <input type="submit" name = "logout" value="Sign Out">
+                  </form>
+                {%else%}
+                <h3>CREATE/LOGIN</h3>
+                <form method = "POST" action = "/" >
+                    <label for="username">Username:</label><br>
+                    <input type="text" style = "background-color:#eec7fe" id="username" name="username" required><br>
+                    <label for="password">Password:</label><br>
+                    <input type="text" style = "background-color:#eec7fe" id="password" name="password" required><br/>
+                    <br/>
+                    <input type="submit" name = "create_new_user" value="Create New User">
+                    <input type="submit" name = "login" value="Login">
+                    <br></br>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {%if messages %}
+                      {%for category,message in messages %}
+                        {%if category == 'error'%}
+                          <div class = "alert alert-danger alter-dismissable fade show" role = "alert">
+                            {{ message }}
+                          </div>
+                        {%else%}
+                          <div class = "alert alert-success alter-dismissable fade show" role = "alert">
+                            {{ message }}
+                          </div>
+                        {%endif%}
+                      {%endfor%}
+                    {%endif%}
+                    {%endwith%}
                 </form>
-              {%else%}
-              <h3>CREATE/LOGIN</h3>
-              <form method = "POST" action = "/" >
-                  <label for="username">Username:</label><br>
-                  <input type="text" style = "background-color:#eec7fe" id="username" name="username" required><br>
-                  <label for="password">Password:</label><br>
-                  <input type="text" style = "background-color:#eec7fe" id="password" name="password" required><br/>
-                  <br/>
-                  <input type="submit" name = "create_new_user" value="Create New User">
-                  <input type="submit" name = "login" value="Login">
-                  <br></br>
-                  {% with messages = get_flashed_messages(with_categories=true) %}
-                  {%if messages %}
-                    {%for category,message in messages %}
-                      {%if category == 'error'%}
-                        <div class = "alert alert-danger alter-dismissable fade show" role = "alert">
-                          {{ message }}
-                        </div>
-                      {%else%}
-                        <div class = "alert alert-success alter-dismissable fade show" role = "alert">
-                          {{ message }}
-                        </div>
-                      {%endif%}
-                    {%endfor%}
-                  {%endif%}
-                  {%endwith%}
-              </form>
-              {%endif%}
+                {%endif%}
+              </div>
             </div>
-          </div>
 
-          <div class = "outer-descript">
-            <div class = "high-score">
-              <h3>High Score</h3>
-              <p>1. Awesome-o<p>
+            <div class = "outer-descript">
+              <div class = "high-score">
+                <h3>High Score</h3>
+                <p>1. Awesome-o<p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class = "buffer-container"> </div>
+        <div class = "buffer-container"> </div>
       
   
     </main>

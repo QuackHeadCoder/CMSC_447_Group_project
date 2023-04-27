@@ -1,184 +1,213 @@
-import binascii
-import uuid
 
-from flask import Flask, request, jsonify, json, render_template, url_for, redirect
+import sqlite3
+from flask import Flask, request, jsonify, json, render_template, url_for, redirect, flash
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-# from Crypto.Cipher import AES
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, login_required, logout_user, LoginManager, current_user, UserMixin
 
-key = uuid.uuid4().bytes
-"""The encryption key.   Random for this example."""
-
-nonce = uuid.uuid4().bytes
-"""for WHERE criteria to work, we need the encrypted value to be the same
-each time, so use a fixed nonce if we need that feature.
-"""
 app = Flask(__name__)
 CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SECRET_KEY'] = 'shhh this is a secret'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
-class User(db.Model):
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+    
+
+
+#locates user from username/key
+@login_manager.user_loader
+def load_user(username):
+    return User.query.get(username)
+
+@app.route('/api/get', methods = ['GET'])
+def getJson():
+    return {"data:":
+                [
+                    {
+                        "Group": "A",
+                        "Title":"Top 5 Scores",
+                        "<1st Name>": "<1st score>",
+                    	"<2nd Name>": "<2nd score>",
+                        "<3nd Name>": "<3nd score>",
+                        "<4nd Name>": "<4nd score>",
+                        "<5nd Name>": "<5nd score>",
+                    }
+                ]
+            }
+
+@app.route("/api/get_user_level", methods = ['GET'])
+def getUser():
+    json = request.get_json()
+    
+    #validation
+    if (json.get("username") is not None and 
+        json.get("password") is not None and
+        json.get("id") is not None):
+        
+        username = json.get("username")
+        password = json.get("password")
+        id = json.get("id")
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            if check_password_hash(user.password,password) and user.id == id:
+                
+                return {"currentLevel":user.currentLevel}
+
+    
+    return "Error Incorrect Information"
+
+@app.route('/api/update_user', methods = ['PUT'])
+def updateUser():
+    
+    json = request.get_json()
+    
+    #validation
+    if (json.get("username") is not None and 
+        json.get("password") is not None and
+        json.get("id") is not None and
+        json.get("currentLevel") is not None and
+        json.get("topScore") is not None):
+        
+        username = json.get("username")
+        password = json.get("password")
+        id = json.get("id")
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            if check_password_hash(user.password,password) and user.id == id:
+                
+                user.currentLevel = json.get("currentLevel")
+                user.topScore = json.get("topScore")
+                db.session.commit()
+                return 'ok'
+
+    
+    return "Not okay"
+
+#Basic User Information
+class User(UserMixin,db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     username = db.Column(db.String(30), unique = True, nullable=False)
+    password = db.Column(db.String(30),nullable=False)
     currentLevel = db.Column(db.Integer, default = 1)
     topScore = db.Column(db.Integer, default = 0)
     dateAdded = db.Column(db.DateTime, default = datetime.utcnow)
 
-    def __repr__(self):
-        return f"username: '{self.username}', id: {self.id}, currentLevel: {self.currentLevel}, dateAdded: {self.dateAdded}, topScore: {self.topScore}"
-    
-class Password(db.Model):
-    __tablename__ = 'passwords'
-    username = db.Column(db.String(30), db.ForeignKey('users.id'), nullable = False, primary_key = True)
-    password = db.Column(db.String(30), nullable = False)
+
 
     def __repr__(self):
-        return f"username: {self.username}, password: {self.password}"
-
-class Score(db.Model):
-    __tablename__ = 'scores'
-    id = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    username = db.Column(db.String(30), db.ForeignKey('users.id'))
-    score = db.Column(db.Integer, default = 0)
-
-    def __repr__(self):
-        return f"username: {self.username}, score: {self.score}"
+        return f"""
+            id: '{self.id}'
+            username: '{self.username}'
+            password: '{self.password}'
+            currentLevel: '{self.currentLevel}'
+            topScore: '{self.topScore}'
+            dateAdded: '{self.dateAdded}'
+            """
 
 
-# def encrypt(data):
-#     cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
-#     data = data + (" " * (16 - (len(data) % 16)))
-#     return cipher.encrypt(data.encode("utf-8")).hex()
 
-@app.route('/')
-def index():
-    #home page
-    return render_template('index.html')
+#for testing purposes
+def testingDB():
 
-
-@app.route('/getAllUsers')
-def getAllUsers():
-    #return list of all users and their top score
-    users = User.query.all()
-    for user in users:
-        print (user)
-    return "getAllUsers called"
-
-@app.route('/getLeaderboard')
-def getLeaderboard():
-    #return top 10 scores from scores table
-    scores = Score.query.order_by(Score.score.desc()).limit(10).all()
-    print(scores)
-    return "getLeaderboard called"
-
-@app.route('/addNewUser', methods = ['POST', 'GET'])
-def addNewUser():
-    #if username is not taken, add new user with new credentials
-    #username and password for new account should be in request body
-    if(request.method in ['POST','OPTIONS']):
-
-        username = request.form['username']
-
-        oldUser = User.query.filter_by(username=username).first()
-        if(oldUser):
-            return f"username '{username}' already taken "
-        
-        
-        password = request.form['password']
-        newUser = User(username = username,currentLevel = 1, topScore=0)
-        newPassword = Password(username = username, password = encrypt(password))
-        
-        db.session.add(newUser)
-        db.session.add(newPassword)
+    #clearing database
+    try:
+        db.session.query(User).delete()
         db.session.commit()
-
-        return f"new user with username: '{username}' added"
+    except:
+        db.session.rollback()
     
-    else: #get request
-        return render_template('createUser.html')
+    testUsers = [
+        User(id=0,username="testUser1",password=generate_password_hash("password1",method='sha256'),currentLevel=1,topScore=25),
+        User(id=1,username="testUser2",password=generate_password_hash("password2",method='sha256'),currentLevel=1,topScore=125),
+        User(id=2,username="testUser3",password=generate_password_hash("password3",method='sha256'),currentLevel=2,topScore=35),
+        User(id=3,username="testUser4",password=generate_password_hash("password4",method='sha256'),currentLevel=2,topScore=65),
+        User(id=4,username="testUser5",password=generate_password_hash("password5",method='sha256'),currentLevel=1,topScore=85),
+    ]
+    #adding some default users
+    for users in testUsers:
+        db.session.add(users)
+        print(users)
+    db.session.commit()
 
 
-@app.route('/deleteUser', methods = ['DELETE', 'OPTIONS', 'GET'])
-def deleteUser():
-    #delete preexisting user
-    #safely remove from password, score(s), and user objects
-    if(request.method in ['DELETE', 'OPTIONS']):
-        username = request.args['username']
 
-        user = User(username = username)
-        password = Password(username = username)
-        scores = Score.query.filter_by(username = username).all()
-
-        if(user):
-            for score in scores:
-                db.session.delete(score)
-            db.session.delete(password)
-            db.session.delete(user)
-            db.session.commit()
-            return f"deleted user {username}"
-        else:
-            return f"user {username} not found"
-    else:
-        return f"deleteUser called"
-
-
-@app.route('/getUserTopScore/<username>')
-def getUserTopScore(username):
-    #return top score of given user
-    user = User.query.filter_by(username=username).first()
-    if user:
-        return f"{user.topScore}"
-    else:
-        return '0'
-
-#helper function for logging in
-def checkPassword(username, password):
-    #check if username and password are a match in the password database
-    user = User.query.filter_by(username=username).first()
-    if(not user):
-        return f"user {username} not found"
-    userPassword = Password.query.filter_by(username=username).first()
-    if(encrypt(password) == userPassword.password):
-        return 'Match Found !'
-    return 'Username and Password do not match.'
-
-@app.route('/updateScore', methods = ['POST', 'OPTIONS', 'GET'])
-def updateScore():
-    #if score is high enough, update leaderboards table and current user's top score
-    #request body should contain username and score
-    #also update user's level if needed
-    if(request.method in ['POST', 'OPTIONS']):
-        username = request.args['username']
-        score = request.args['score']
-
-        user = User.query.filter_by(username = username).first()
-        if(user):
-            if(score > user.topScore()):
-                db.session.query(User).filter_by(username = username).first().update({"topScore":score})
-            
-            scores = Score.query.order_by(Score.score.desc()).limit(10).all()
-            if(score>scores[-1]):
-                newScore = Score(username=username, score=score)
-                db.session.add(newScore)
-
-            db.session.commit()
-
-            return f"scores updated"
+#home page
+@app.route('/', methods = ['GET','POST'])
+def index():
+    if request.method == 'POST':
         
-        return f"user not found"
+        
+        if request.form.get('login') is not None:
+           username = request.form.get('username')
+           password = request.form.get('password')
 
-    else:
-        return f"updateScore called"
+           user = User.query.filter_by(username=username).first()
+           if user:
+               if check_password_hash(user.password,password):
+                   login_user(user,remember=True)
+                   return redirect(url_for("index"))
+               else:
+                   flash("Incorrect username or password, try again.", category = 'error')
+           else:
+               flash("Incorrect username or password, try again.", category = 'error')
+
+
+
+
+
+        elif request.form.get('create_new_user') is not None:
+            newUser = request.form['username']
+            newPass = request.form['password']
+
+            user = User.query.filter_by(username=newUser).first()
+            if(user):
+                flash("Username already in use, try again.", category = 'error')
+            elif len(newUser) < 4:
+                flash("Username must be more than 4 characters", category = 'error')
+            elif len(newPass) < 6:
+                flash("password must be more than 6 characters", category = 'error')
+            else:
+                newUser = User(username=newUser, password=generate_password_hash(newPass,method='sha256'))
+                db.session.add(newUser)
+                db.session.commit()
+                login_user(newUser,remember=True)
+                return redirect(url_for("index"))
+            
+        elif request.form.get('logout') is not None:
+            print("RUNS")
+            logout_user()
+            return redirect(url_for('index'))
+        
+
+
+    return render_template('index.html', user=current_user)
+
+
+
+
 
 if __name__ == '__main__':
+    
+
     with app.app_context():
         db.create_all() 
+        #for testing purposes NEED TO REMOVE WHEN FINISHED
+        testingDB()
+
         app.run(debug=True)
+
+
 
     
