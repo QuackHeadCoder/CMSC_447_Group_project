@@ -2,6 +2,4 @@ flask 2.2.3
 flask_cors
 flask_sqlalchemy
 flask_login
-flask_restful
 werkzeug.security
-flask_marshmallow

@@ -9,7 +9,8 @@ currentLevel = 2
 topScore = 5000
 
 header = {'Content-type':"application/json"}
-response = requests.put(base+"/api/update_user",json={"username":username,"id":id,"password":password,"currentLevel":currentLevel,"topScore":topScore},headers=header)
+response = requests.put(base+"/api/update_user")
+#response = requests.put(base+"/api/update_user",json={"username":username,"id":id,"password":password,"currentLevel":currentLevel,"topScore":topScore},headers=header)
 print(response.content)
 
 #testing get data (for prof)

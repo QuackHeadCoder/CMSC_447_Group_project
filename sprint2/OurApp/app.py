@@ -45,22 +45,21 @@ def getJson():
             }
 
 @app.route("/api/get_user_level", methods = ['GET'])
-def getUser():
+def getUserLevel():
     json = request.get_json()
-    
+    if json is None:
+        return "Not okay"
+
     #validation
     if (json.get("username") is not None and 
         json.get("password") is not None and
         json.get("id") is not None):
-        
         username = json.get("username")
         password = json.get("password")
         id = json.get("id")
-
         user = User.query.filter_by(username=username).first()
         if user:
             if check_password_hash(user.password,password) and user.id == id:
-                
                 return {"currentLevel":user.currentLevel}
 
     
@@ -70,7 +69,9 @@ def getUser():
 def updateUser():
     
     json = request.get_json()
-    
+    if json is None:
+        return "Not okay"
+
     #validation
     if (json.get("username") is not None and 
         json.get("password") is not None and
