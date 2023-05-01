@@ -5,8 +5,90 @@
  */
 
 /**
- * @todo add doc
+ * @todo add doc/API call to request user information
+ * @todo when game is finished it should make a PUT request to update user information
  */
+
+//for API get/put calls
+url = "http://127.0.0.1:5000/"
+
+/**
+ * Getting user data
+ * null otherwise
+ **/
+async function getData() {
+
+  //attempts to get data
+  try {
+    response = await fetch(url+"get");
+    jsonData = await response.json();
+    let id = jsonData["id"];
+    let username = jsonData["username"];
+    let password = jsonData["password"];
+    let currentLevel = jsonData["currentLevel"];
+    let topScore = jsonData["topScore"];
+    return {id,username,password,currentLevel,topScore};
+  }
+
+  //catches error if user is not currently logged in
+  catch (error) {
+    return null;
+  }
+}
+
+/** 
+ * Update user will only take in current level and top score values
+ * If top score is not changed then we just ignore and return null
+**/
+
+async function updateUser(currentLevel,topScore){
+  data = await getData();
+
+  if(topScore <= data["topScore"])
+    return null;
+
+  data["currentLevel"] = currentLevel;
+  data["topScore"] = topScore;
+
+  const response = await fetch(url+"api/update_user", {
+    method: 'PUT',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  // Awaiting response.json()
+  const ret = await response;
+  console.log(ret);
+  return ret
+}
+/*
+A simple example on how to use the get Data function
+As well as how to update User
+Delete this when to reduce console logs
+*/
+async function test(){
+
+  //since it is async it needs an await call to wait for the response from the server
+  //then once it is stored we can manipulate the data in which way we want such as printing out the id
+  data = await getData();
+  console.log(data['currentLevel']);
+
+  //updates user level,score
+  updateUser(3,15);
+  data = await getData();
+  console.log(data['currentLevel']);
+}
+test();
+
+
+
+
+
+
+
+
+
 function meteors(scene, meteor_key) {
   // private
   this.meteors = scene.physics.add.group();

@@ -44,27 +44,6 @@ def getJson():
                 ]
             }
 
-@app.route("/api/get_user_level", methods = ['GET'])
-def getUserLevel():
-    json = request.get_json()
-    if json is None:
-        return "Not okay"
-
-    #validation
-    if (json.get("username") is not None and 
-        json.get("password") is not None and
-        json.get("id") is not None):
-        username = json.get("username")
-        password = json.get("password")
-        id = json.get("id")
-        user = User.query.filter_by(username=username).first()
-        if user:
-            if check_password_hash(user.password,password) and user.id == id:
-                return {"currentLevel":user.currentLevel}
-
-    
-    return "Error Incorrect Information"
-
 @app.route('/api/update_user', methods = ['PUT'])
 def updateUser():
     
@@ -85,7 +64,7 @@ def updateUser():
 
         user = User.query.filter_by(username=username).first()
         if user:
-            if check_password_hash(user.password,password) and user.id == id:
+            if user.password == password and user.id == id:
                 
                 user.currentLevel = json.get("currentLevel")
                 user.topScore = json.get("topScore")
@@ -105,7 +84,15 @@ class User(UserMixin,db.Model):
     topScore = db.Column(db.Integer, default = 0)
     dateAdded = db.Column(db.DateTime, default = datetime.utcnow)
 
-
+    def getJson(self):
+        return json.dumps({
+            "id": self.id,
+            "username": self.username,
+            "password": self.password,
+            "currentLevel": self.currentLevel,
+            "topScore": self.topScore,
+            "dateAdded": self.dateAdded,
+        })
 
     def __repr__(self):
         return f"""
@@ -136,12 +123,21 @@ def testingDB():
         User(id=3,username="testUser4",password=generate_password_hash("password4",method='sha256'),currentLevel=2,topScore=65),
         User(id=4,username="testUser5",password=generate_password_hash("password5",method='sha256'),currentLevel=1,topScore=85),
     ]
+
     #adding some default users
     for users in testUsers:
         db.session.add(users)
-        print(users)
+
     db.session.commit()
 
+@app.route('/get',methods=['GET'])
+def getCurrentUser():
+    if current_user.is_authenticated:
+        user = User.query.filter_by(id=current_user.id).first()
+        print(user.getJson())
+        return user.getJson()
+    else:
+        return "Error login required"
 
 
 #home page

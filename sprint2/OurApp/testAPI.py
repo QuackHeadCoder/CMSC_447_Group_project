@@ -18,6 +18,4 @@ input("Press enter to continue\n")
 response = requests.get(base+"/api/get")
 print(response.json())
 
-input("Press enter to continue\n")
-response = requests.get(base+"/api/get_user_level",json = {"username":username,"password":password,"id":id})
-print(response.json())
+
