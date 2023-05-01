@@ -40,16 +40,19 @@ async function getData() {
  * Update user will only take in current level and top score values
  * If top score is not changed then we just ignore and return null
 **/
-
 async function updateUser(currentLevel,topScore){
+  //get data, if no data is loaded we quit
   data = await getData();
+  if(data == null)return null;
 
+  //if top score does not need to be updated we quit
   if(topScore <= data["topScore"])
     return null;
 
   data["currentLevel"] = currentLevel;
   data["topScore"] = topScore;
 
+  //data packet that needs to be sent
   const response = await fetch(url+"api/update_user", {
     method: 'PUT',
     headers: {
@@ -57,7 +60,8 @@ async function updateUser(currentLevel,topScore){
     },
     body: JSON.stringify(data)
   });
-  // Awaiting response.json()
+
+  //simple logging of response
   const ret = await response;
   console.log(ret);
   return ret
