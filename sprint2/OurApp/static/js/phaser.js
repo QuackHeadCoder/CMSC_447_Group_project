@@ -431,6 +431,8 @@ var config = {
 
 // meteor
 const meteor_max_scale = 4;
+const level1scenekey = "level1Scene";
+const level2scenekey = "level2Scene";
 
 /* END OF CONSTANT */
 
@@ -496,7 +498,18 @@ function preload() {
 }
 /*LEVEL 1 CODE BEGINS */
 function create() {
-  //music
+
+}
+
+function update() {
+    this.scene.start(level1scenekey);
+}
+
+/* LEVEL 1 CODE ENDS */
+var level1Scene = new Phaser.Scene(level1scenekey);
+
+level1Scene.create = function() {
+    //music
   music = this.sound.add("gaming_music",{loop:true,volume:0.5});
   music.play();
 
@@ -667,9 +680,13 @@ function create() {
       bonus.destroy();
     }
   );
+
+
+
 }
 
-function update() {
+
+level1Scene.update = function(){
   if(level2){
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
@@ -679,7 +696,7 @@ function update() {
     
     this.time.delayedCall(1500, function() {
       nextLevelText = "";
-      this.scene.start("level2Scene");
+      this.scene.start(level2scenekey);
     }, [], this);
     
   }
@@ -707,10 +724,11 @@ function update() {
     level2 = true;
   }
 }
-/* LEVEL 1 CODE ENDS */
+
+
 
 /* LEVEL 2 CODE BEGINS*/
-var level2Scene = new Phaser.Scene("level2Scene");
+var level2Scene = new Phaser.Scene(level2scenekey);
 
 level2Scene.create = function() {
   this.time.timeScale = 1;
@@ -870,4 +888,5 @@ level2Scene.update = function() {
 
 var game = new Phaser.Game(config);
 
-game.scene.add("level2Scene", level2Scene);
+game.scene.add(level1scenekey,level1Scene)
+game.scene.add(level2scenekey, level2Scene);
