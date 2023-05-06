@@ -9,9 +9,12 @@
  * @todo when game is finished it should make a PUT request to update user information
  */
 
+
 //for API get/put calls
 url = "http://127.0.0.1:5000/"
 
+
+var playerData = null;
 /**
  * Getting user data
  * null otherwise
@@ -27,7 +30,8 @@ async function getData() {
     let password = jsonData["password"];
     let currentLevel = jsonData["currentLevel"];
     let topScore = jsonData["topScore"];
-    return {id,username,password,currentLevel,topScore};
+    playerData ={id,username,password,currentLevel,topScore};
+    return playerData
   }
 
   //catches error if user is not currently logged in
@@ -495,6 +499,73 @@ function preload() {
     frameHeight: 48,
   });
   this.load.audio("gaming_music",["../static/js/assets/hey_ya.mp3"]);
+
+  //Progress bar
+
+  //creating box and bar and some coloring
+  var progressBar = this.add.graphics();
+  var progressBox = this.add.graphics();
+  progressBox.fillStyle(0x222222, 0.8);
+  progressBox.fillRect(240, 270, 320, 50);
+  
+  //adjusting dimensions
+  var width = this.cameras.main.width;
+  var height = this.cameras.main.height;
+  var loadingText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 50,
+      text: 'Loading...',
+      style: {
+          font: '20px monospace',
+          fill: '#000000'
+      }
+  });
+  loadingText.setOrigin(0.5, 0.5);
+  
+  var percentText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 5,
+      text: '0%',
+      style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+      }
+  });
+  percentText.setOrigin(0.5, 0.5);
+  
+  var assetText = this.make.text({
+      x: width / 2,
+      y: height / 2 + 50,
+      text: '',
+      style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+      }
+  });
+  assetText.setOrigin(0.5, 0.5);
+  
+  //setting value of progress bar and to be placed in the bar
+  this.load.on('progress', function (value) {
+      percentText.setText(parseInt(value * 100) + '%');
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+  });
+  
+  //setting value of asset loading to be placed under bar
+  this.load.on('fileprogress', function (file) {
+      assetText.setText('Loading asset: ' + file.key);
+  });
+
+  //simple cleanup
+  this.load.on('complete', function () {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+      assetText.destroy();
+  });
+
 }
 /*LEVEL 1 CODE BEGINS */
 function create() {
