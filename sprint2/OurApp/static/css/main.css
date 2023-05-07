@@ -1,6 +1,6 @@
 html{
-    background:linear-gradient(to bottom, rgb(15, 114, 15), rgb(6, 113, 6));
-    overflow:hidden;
+    background:linear-gradient(to bottom, rgb(127, 5, 123), rgb(72, 2, 69));
+    overflow:auto;
     height:100%;
 }
 .header{
@@ -16,8 +16,9 @@ main{
     height:1400px;
     padding-top: 0%;
     display:flex;
-    animation: space 60s ease infinite;
+    animation: space 240s linear infinite;
 }
+
 @keyframes space {
 	0% {
 		background-position: 0% 50%;
@@ -33,12 +34,14 @@ main{
 
 
 .buffer-container{
+    align-items: center;
+    flex:10%;
     margin:2px;
     background-color:rgba(0,0,0,0);
-    flex:10%;
 }
 
 .middle-container{
+    overflow-y:auto;
     flex:80%;
     padding:2%;
     outline: solid,3px, black;
@@ -98,19 +101,24 @@ main{
 }
 .table-container{
     display:flex;
+    align-items:center;
+    align-self:center;
     width:100%;
     min-height:400px;
 }
 
 
 .outer-descript{
-    flex:100%;
+    flex:33%;
+    display:flex;
+    align-items:center;
+    align-self:center;
     outline: solid 3px black;
     margin:3%;
     background:linear-gradient(to bottom right,black,rgb(31, 179, 212),rgb(8, 144, 142),black);
     background-size: 400% 400%;
-    min-height:356px;
-    min-width:356px;
+    height:370px;
+    width:370px;
     animation: gradient 5s ease infinite;
 }
 
@@ -127,26 +135,31 @@ main{
 }
 
 .description{
-    margin:3%;
-    padding:2%;
-    min-height:350px;
+    flex:100%;
+    margin:10px;
+    padding:10px;
+    height:350px;
     background: rgb(24, 133, 223);
     font-size: 14;
     outline:solid 1px black;
+    overflow:auto;
 }
 .high-score{
-    margin:3%;
-    padding:2%;
-    min-height:350px;
+    margin:10px;
+    padding:10px;
+    flex:100%;
+    height:350px;
     background: rgb(24, 133, 223);
     outline:solid 1px black;
+    overflow:auto;
 }
 
 .log-in{
-    margin:3%;
-    padding:2%;
-    min-height:350px;
-    min-width:350px;
+    margin:10px;
+    padding:10px;
+    flex:100%;
+    height:350px;
     background: rgb(24, 133, 223);
     outline:solid 1px black;
+    overflow:auto;
 }

@@ -5,8 +5,98 @@
  */
 
 /**
- * @todo add doc
+ * @todo add doc/API call to request user information
+ * @todo when game is finished it should make a PUT request to update user information
  */
+
+
+//for API get/put calls
+url = "http://127.0.0.1:5000/"
+
+
+var playerData = null;
+/**
+ * Getting user data
+ * null otherwise
+ **/
+async function getData() {
+
+  //attempts to get data
+  try {
+    response = await fetch(url+"get");
+    jsonData = await response.json();
+    let id = jsonData["id"];
+    let username = jsonData["username"];
+    let password = jsonData["password"];
+    let currentLevel = jsonData["currentLevel"];
+    let topScore = jsonData["topScore"];
+    playerData ={id,username,password,currentLevel,topScore};
+    return playerData
+  }
+
+  //catches error if user is not currently logged in
+  catch (error) {
+    return null;
+  }
+}
+
+/** 
+ * Update user will only take in current level and top score values
+ * If top score is not changed then we just ignore and return null
+**/
+async function updateUser(currentLevel,topScore){
+  //get data, if no data is loaded we quit
+  data = await getData();
+  if(data == null)return null;
+
+  //if top score does not need to be updated we quit
+  if(topScore <= data["topScore"])
+    return null;
+
+  data["currentLevel"] = currentLevel;
+  data["topScore"] = topScore;
+
+  //data packet that needs to be sent
+  const response = await fetch(url+"api/update_user", {
+    method: 'PUT',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  //simple logging of response
+  const ret = await response;
+  console.log(ret);
+  return ret
+}
+/*
+A simple example on how to use the get Data function
+As well as how to update User
+Delete this when to reduce console logs
+*/
+async function test(){
+
+  //since it is async it needs an await call to wait for the response from the server
+  //then once it is stored we can manipulate the data in which way we want such as printing out the id
+  data = await getData();
+  console.log(data['currentLevel']);
+
+  //updates user level,score
+  updateUser(3,15);
+  data = await getData();
+  console.log(data['currentLevel']);
+}
+test();
+
+
+
+
+
+
+
+
+
 function meteors(scene, meteor_key) {
   // private
   this.meteors = scene.physics.add.group();
@@ -350,6 +440,8 @@ var config = {
 
 // meteor
 const meteor_max_scale = 4;
+const level1scenekey = "level1Scene";
+const level2scenekey = "level2Scene";
 
 /* END OF CONSTANT */
 
@@ -412,12 +504,90 @@ function preload() {
     frameWidth: 32,
     frameHeight: 48,
   });
-  this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
+  this.load.audio("gaming_music",["../static/js/assets/hey_ya.mp3"]);
+
+  //Progress bar
+
+  //creating box and bar and some coloring
+  var progressBar = this.add.graphics();
+  var progressBox = this.add.graphics();
+  progressBox.fillStyle(0x222222, 0.8);
+  progressBox.fillRect(240, 270, 320, 50);
+  
+  //adjusting dimensions
+  var width = this.cameras.main.width;
+  var height = this.cameras.main.height;
+  var loadingText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 50,
+      text: 'Loading...',
+      style: {
+          font: '20px monospace',
+          fill: '#000000'
+      }
+  });
+  loadingText.setOrigin(0.5, 0.5);
+  
+  var percentText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 5,
+      text: '0%',
+      style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+      }
+  });
+  percentText.setOrigin(0.5, 0.5);
+  
+  var assetText = this.make.text({
+      x: width / 2,
+      y: height / 2 + 50,
+      text: '',
+      style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+      }
+  });
+  assetText.setOrigin(0.5, 0.5);
+  
+  //setting value of progress bar and to be placed in the bar
+  this.load.on('progress', function (value) {
+      percentText.setText(parseInt(value * 100) + '%');
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+  });
+  
+  //setting value of asset loading to be placed under bar
+  this.load.on('fileprogress', function (file) {
+      assetText.setText('Loading asset: ' + file.key);
+  });
+
+  //simple cleanup
+  this.load.on('complete', function () {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+      assetText.destroy();
+  });
+
 }
 /*LEVEL 1 CODE BEGINS */
 function create() {
-  //music
-  music = this.sound.add("gaming_music", { loop: true, volume: 0.5 });
+
+}
+
+function update() {
+    this.scene.start(level1scenekey);
+}
+
+/* LEVEL 1 CODE ENDS */
+var level1Scene = new Phaser.Scene(level1scenekey);
+
+level1Scene.create = function() {
+    //music
+  music = this.sound.add("gaming_music",{loop:true,volume:0.5});
   music.play();
 
   this.add.image(400, 300, "sky");
@@ -586,25 +756,25 @@ function create() {
       bonus.destroy();
     }
   );
+
+
+
 }
 
-function update() {
-  if (level2) {
+
+level1Scene.update = function(){
+  if(level2){
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
       font: "30px Courier",
       fill: "#FFFFFF",
     });
-
-    this.time.delayedCall(
-      1500,
-      function () {
-        nextLevelText = "";
-        this.scene.start("level2Scene");
-      },
-      [],
-      this
-    );
+    
+    this.time.delayedCall(1500, function() {
+      nextLevelText = "";
+      this.scene.start(level2scenekey);
+    }, [], this);
+    
   }
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
@@ -631,10 +801,11 @@ function update() {
     // bombs.destroy_all();
   }
 }
-/* LEVEL 1 CODE ENDS */
+
+
 
 /* LEVEL 2 CODE BEGINS*/
-var level2Scene = new Phaser.Scene("level2Scene");
+var level2Scene = new Phaser.Scene(level2scenekey);
 
 level2Scene.create = function () {
   this.time.timeScale = 1;
@@ -999,5 +1170,5 @@ level3Scene.update = function () {
 
 var game = new Phaser.Game(config);
 
-game.scene.add("level2Scene", level2Scene);
-game.scene.add("level3Scene", level3Scene);
+game.scene.add(level1scenekey,level1Scene)
+game.scene.add(level2scenekey, level2Scene);

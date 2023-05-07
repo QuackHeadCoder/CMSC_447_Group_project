@@ -1,1 +1,5 @@
 flask 2.2.3
+flask_cors
+flask_sqlalchemy
+flask_login
+werkzeug.security
