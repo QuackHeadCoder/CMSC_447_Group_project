@@ -43,10 +43,35 @@
                   <a class="dropdown-item" href="https://github.com/JWongCentral/">Jack Wong</a>
                 </div>
               </li>
-
             </ul>
           </div>
         </div>
+        {% if user.is_authenticated %}
+        <div class = "signed-in-navbar d-flex">
+          <form method = "POST" action = "/" class = "navbar-login d-flex">
+            <p>Welcome! </p>
+            <h3> {{user.username}} </h3>
+            <input type="submit" class = "navbar-signout" id="create_new_user-nav"name = "create_new_user-nav" value="Signout">
+
+
+          </form>
+            
+        </div>
+        {%else%}
+        <form method = "POST" action = "/" class = "navbar-login d-flex">
+          <div class = "navbar-login-text">
+            <p>ID:</p>
+          </div>
+          
+          <input type = "text" class = "username-text-box form-control me-2" id = "username-nav" name = "username-nav" placeholder = "username" required>
+          <div class = "navbar-login-text">
+            <p>PW:</p>
+          </div>
+          <input type = "text" class = "username-text-box  form-control me-2" id = "password-nav" name = "password-nav" placeholder = "password" required>
+          <input type="submit" class = "navbar-submit" id="login-nav" name = "login-nav" value="Login">
+          <input type="submit" class = "navbar-submit" id="create_new_user-nav"name = "create_new_user-nav" value="Signup">
+        </form>
+        {%endif%}
       </nav>
     </header>
     
@@ -58,8 +83,10 @@
             <h1>Sky Fall</h1>
 
           </div>
-          <div class = "game" id = "game">
-            <script type = "text/javascript" src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
+          <div class = "game-outer">
+            <div class = "game" id = "game">
+              <script type = "text/javascript" src = "{{ url_for('static', filename='js/phaser.js') }}"></script>
+            </div>
           </div>
 
           <div class = "table-container">
@@ -70,16 +97,19 @@
                     <th>How to Play</th>
                   </tr>
                   <tr>
-                    <td>1. use the arrow keys to move</td>
+                    <td>1. Left and Right arrows to move in its respective positions</td>
                   </tr>
                   <tr>
-                    <td>2. Dodge the meteors to earn points</td>
+                    <td>2. Up arrow is to jump.</td>
                   </tr>
                   <tr>
-                    <td>3. Each meteor dodged is one point</td>
+                    <td>3. Dodge the meteors to earn points</td>
                   </tr>
                   <tr>
-                    <td>4. You can pickup power ups to improve your chances of surviving</td>
+                    <td>4. Each meteor dodged is one point</td>
+                  </tr>
+                  <tr>
+                    <td>5. You can pickup power ups to improve your chances of surviving</td>
                   </tr>
 
                 </table>
@@ -93,18 +123,16 @@
                   <p>level: {{ user.currentLevel}}</p>
                   <p>High Score: {{user.topScore}}</p>
                   <form method="POST" action = "/">
-                    <input type="submit" name = "logout" value="Sign Out">
+                    <input type="submit" class = "login-submit" name = "logout" value="Sign Out">
                   </form>
                 {%else%}
                 <h3>CREATE/LOGIN</h3>
                 <form method = "POST" action = "/" >
-                    <label for="username">Username:</label><br>
-                    <input type="text" style = "background-color:#eec7fe" id="username" name="username" required><br>
-                    <label for="password">Password:</label><br>
-                    <input type="text" style = "background-color:#eec7fe" id="password" name="password" required><br/>
-                    <br/>
-                    <input type="submit" name = "create_new_user" value="Create New User">
-                    <input type="submit" name = "login" value="Login">
+                    <input type="text" class = "login-box" id="username" placeholder = "username" name="username" required>
+                    <input type="text" class = "login-box" id="password" placeholder = "password" name="password" required>
+                    <br></br>
+                    <input type="submit" class = "login-submit" name = "create_new_user" value="Create New User">
+                    <input type="submit" class = "login-submit" name = "login" value="Login">
                     <br></br>
                     {% with messages = get_flashed_messages(with_categories=true) %}
                     {%if messages %}
