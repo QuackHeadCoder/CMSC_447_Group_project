@@ -433,6 +433,7 @@ var config = {
 const meteor_max_scale = 4;
 const level1scenekey = "level1Scene";
 const level2scenekey = "level2Scene";
+const characterscenekey = "characterScene";
 
 /* END OF CONSTANT */
 
@@ -458,6 +459,7 @@ var gameOver = false;
 var gameOverText;
 var level2 = false;
 var nextLevelText = "";
+var player_skin = "default";
 
 // support functions
 function hitBomb(player, bomb) {
@@ -490,6 +492,7 @@ function preload() {
   this.load.image("night","../static/js/assets/level2night.webp");
   this.load.image("level2ground","../static/js/assets/emptyplatform.png");
   this.load.image("level2platform","../static/js/assets/level2platform.png");
+  this.load.image("character_screen", "../static/js/assets/skyfall_character.jpg");
   this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -522,7 +525,70 @@ function create() {
 }
 
 function update() {
-    this.scene.start(level1scenekey);
+    this.scene.start(characterscenekey);
+}
+
+var characterScreen = new Phaser.Scene(characterscenekey);
+
+characterScreen.create = function () {
+  this.add.image(400, 300, "character_screen");
+  
+  startButton = this.add.text(70, 400, 'Basketball')
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => 
+    player_skin = "player")
+    .on('pointerdown', () => 
+    this.scene.start(level1scenekey))
+
+startButton = this.add.text(220, 400, 'CDawg')
+  .setOrigin(0.5)
+  .setPadding(5)
+  .setStyle({ backgroundColor: '#111' })
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  player_skin = "cdawg")
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey))
+
+
+startButton = this.add.text(385, 400, 'DjSang')
+  .setOrigin(0.5)
+  .setPadding(5)
+  .setStyle({ backgroundColor: '#111' })
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  player_skin = "djsang")
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey))
+
+
+startButton = this.add.text(535, 400, 'Duck')
+  .setOrigin(0.5)
+  .setPadding(5)
+  .setStyle({ backgroundColor: '#111' })
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  player_skin = "duck")
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey))
+
+
+startButton = this.add.text(700, 400, 'Pig')
+.setOrigin(0.5)
+.setPadding(5)
+.setStyle({ backgroundColor: '#111' })
+.setInteractive({ useHandCursor: true })
+.on('pointerdown', () => 
+player_skin = "pig")
+.on('pointerdown', () => 
+this.scene.start(level1scenekey))
+
+}
+characterScreen.update = function (){
+
 }
 
 /* LEVEL 1 CODE ENDS */
@@ -552,7 +618,7 @@ level1Scene.create = function() {
   // player = this.physics.add.sprite(16, 450, "player");
   // player.setBounce(0.2);
   // player.setCollideWorldBounds(true);
-  mplayer = player(this, { x: 16, y: 450 }, "player");
+  mplayer = player(this, { x: 16, y: 450 }, player_skin);
 
   // Create a group for bombs
   // bombs = this.physics.add.group();
@@ -780,7 +846,7 @@ level2Scene.create = function() {
     level2platforms.create(750, 300, "level2platform").setScale(1).refreshBody();
     level2platforms.getChildren()[0].setOffset(0, 12);
 
-    mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
+    mplayer.set_player(this.physics.add.sprite(16, 450, player_skin));
     // level2 has increase player speed
     mplayer.set_speed(500);
     bombs.set_meteors(this.physics.add.group());
@@ -918,5 +984,6 @@ level2Scene.update = function() {
 
 var game = new Phaser.Game(config);
 
-game.scene.add(level1scenekey,level1Scene)
+game.scene.add(level1scenekey,level1Scene);
+game.scene.add(characterscenekey,characterScreen);
 game.scene.add(level2scenekey, level2Scene);
