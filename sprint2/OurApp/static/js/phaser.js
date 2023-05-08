@@ -469,7 +469,7 @@ function hitBomb(player, bomb) {
   if (!mscore.get_invincible()) {
     this.physics.pause();
     player.setTint(0xff0000);
-    player.anims.play("turn");
+    player.anims.play("dead");
     gameOver = true;
     gameOverText = this.add.text(300, 250, "Game Over!", {
       font: "30px Courier",
@@ -586,7 +586,27 @@ level1Scene.preload = function () {
   this.load.image("night", "../static/js/assets/level2night.webp");
   this.load.image("level2ground", "../static/js/assets/emptyplatform.png");
   this.load.image("level2platform", "../static/js/assets/level2platform.png");
-  this.load.spritesheet("player", "../static/js/assets/dude.png", {
+  this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("player", "../static/js/assets/players/basketballSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("cdawg", "../static/js/assets/players/cdawgSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("djsang", "../static/js/assets/players/djsangSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("duck", "../static/js/assets/players/duckSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("pig", "../static/js/assets/players/pigSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
@@ -660,7 +680,7 @@ level1Scene.preload = function () {
 };
 level1Scene.create = function () {
   //music
-  music = this.sound.add("gaming_music", { loop: true, volume: 0.5 });
+  music = this.sound.add("gaming_music", { loop: true, volume: 0.1 });
   music.play();
 
   this.add.image(400, 300, "sky");
@@ -726,6 +746,14 @@ level1Scene.create = function () {
     },
   });
 
+  this.physics.add.collider(
+    mplayer.get_player(),
+    bombs.get_meteors(),
+    hitBomb,
+    null,
+    this
+  );
+  
   //player movement animations
   this.anims.create({
     key: "left",
@@ -739,18 +767,28 @@ level1Scene.create = function () {
 
   this.anims.create({
     key: "turn",
-    frames: [{ key: mplayer.get_key(), frame: 4 }],
-    frameRate: mplayer.get_frame_rate(),
+    frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
+      start: 4,
+      end: 7,
+    }),
+    frameRate: mplayer.get_frame_rate()/2,
+    repeat: -1,
   });
 
   this.anims.create({
     key: "right",
     frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
-      start: 5,
-      end: 8,
+      start: 8,
+      end: 11,
     }),
     frameRate: mplayer.get_frame_rate(),
     repeat: -1,
+  });
+
+  this.anims.create({
+    key: "dead",
+    frames: [{ key: mplayer.get_key(), frame: 7 }],
+    frameRate: mplayer.get_frame_rate(),
   });
 
   // Initialize keyboard inputs
@@ -854,7 +892,7 @@ level1Scene.update = function () {
     mplayer.get_player().anims.play("right", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // Collision between bonuses and platforms, destroy bonuses and update score
@@ -1041,7 +1079,7 @@ level2Scene.update = function () {
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // speeds up how fast the objects fall
@@ -1066,7 +1104,27 @@ level3Scene.preload = function () {
   this.load.image("night", "../static/js/assets/level2night.webp");
   this.load.image("level3ground", "../static/js/assets/emptyplatform.png");
   this.load.image("level3platform", "../static/js/assets/level2platform.png");
-  this.load.spritesheet("player", "../static/js/assets/dude.png", {
+  this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("player", "../static/js/assets/players/basketballSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("cdawg", "../static/js/assets/players/cdawgSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("djsang", "../static/js/assets/players/djsangSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("duck", "../static/js/assets/players/duckSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("pig", "../static/js/assets/players/pigSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
@@ -1149,22 +1207,33 @@ level3Scene.create = function () {
 
   this.anims.create({
     key: "turn",
-    frames: [{ key: mplayer.get_key(), frame: 4 }],
+    frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
+      start: 4,
+      end: 7,
+    }),
     frameRate: mplayer.get_frame_rate(),
+    repeat: -1,
   });
 
   this.anims.create({
     key: "right",
     frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
-      start: 5,
-      end: 8,
+      start: 8,
+      end: 11,
     }),
     frameRate: mplayer.get_frame_rate(),
     repeat: -1,
   });
+
   this.anims.create({
     key: "up",
     frames: [{ key: mplayer.get_key(), frame: 4 }],
+    frameRate: mplayer.get_frame_rate(),
+  });
+  
+  this.anims.create({
+    key: "dead",
+    frames: [{ key: mplayer.get_key(), frame: 7 }],
     frameRate: mplayer.get_frame_rate(),
   });
 
@@ -1250,7 +1319,7 @@ level3Scene.update = function () {
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // speeds up how fast the objects fall
@@ -1272,7 +1341,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [level3Scene],
+  scene: [level1Scene, level2Scene, level3Scene],
 };
 
 mscore = score();
