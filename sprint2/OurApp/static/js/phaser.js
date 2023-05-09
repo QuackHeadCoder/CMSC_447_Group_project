@@ -208,6 +208,51 @@ function meteors(scene, meteor_key) {
   };
 }
 
+function menu_meteors(scene, meteor_key) {
+  // private
+  this.menu_meteors = scene.physics.add.group();
+  this.meteors_numbers = 1;
+  this.min_angle = -5; // default is 0 as meteors fall straight down
+  this.max_angle = 5;
+  this.meteor_key = meteor_key;
+  this.meteor_start_range = {
+    min_x: 0,
+    max_x: 750,
+    min_y: 0,
+    max_y: 50,
+  };
+
+  // public
+
+  const get_menu_meteors = () => {
+    return this.meteors;
+  };
+
+  const create_menu_meteor = (meteor_max_scale) => {
+    for (let index = 0; index < this.meteors_numbers; index++) {
+      var meteor = this.menu_meteors.create(
+        Phaser.Math.Between(
+          this.meteor_start_range.min_x,
+          this.meteor_start_range.max_x
+        ),
+        Phaser.Math.Between(
+          this.meteor_start_range.min_y,
+          this.meteor_start_range.max_y
+        ),
+        this.meteor_key
+      );
+      meteor.setScale(Phaser.Math.FloatBetween(1, meteor_max_scale));
+      meteor.setBounce(0.7);
+      meteor.setCollideWorldBounds(true);
+    }
+  }
+
+  return {
+    get_menu_meteors,
+    create_menu_meteor,
+  };
+}
+
 function bonuses(scene, bonus_keys = ["star", "star", "star"]) {
   this.bonuses = scene.physics.add.group();
   this.bonus_keys = bonus_keys;
@@ -433,6 +478,8 @@ var config = {
 const meteor_max_scale = 4;
 const level1scenekey = "level1Scene";
 const level2scenekey = "level2Scene";
+const level3scenekey = "level3Scene";
+const mainmenuscenekey = "mainMenuScene";
 const characterscenekey = "characterScene";
 
 /* END OF CONSTANT */
@@ -493,6 +540,8 @@ function preload() {
   this.load.image("level2ground","../static/js/assets/emptyplatform.png");
   this.load.image("level2platform","../static/js/assets/level2platform.png");
   this.load.image("character_screen", "../static/js/assets/skyfall_character.jpg");
+  this.load.image("startButton", "../static/js/assets/startButton.png");
+  this.load.image("skinsButton", "../static/js/assets/skinsButton.png");
   this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -501,7 +550,7 @@ function preload() {
     frameWidth: 32,
     frameHeight: 48,
   });
-  this.load.spritesheet("player", "../static/js/assets/players/basketballSprite.png", {
+  this.load.spritesheet("basketball", "../static/js/assets/players/basketballSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
@@ -525,25 +574,68 @@ function create() {
 }
 
 function update() {
-    this.scene.start(characterscenekey);
+    this.scene.start(mainmenuscenekey);
 }
+
+var mainMenu = new Phaser.Scene(mainmenuscenekey);
+
+mainMenu.create = function () {
+  music = this.sound.add("gaming_music",{loop:true,volume:0.2});
+  music.play();
+
+  this.add.image(400,300, "sky");
+
+  
+  bombs2 = menu_meteors(this, "bomb");
+  this.time.addEvent({
+    delay: 3000,
+    loop: true,
+    callback: function () {
+      bombs2.create_menu_meteor(meteor_max_scale);
+    },
+  });
+
+  this.physics.add.collider(
+    bombs2.get_menu_meteors(),
+    bombs2.get_menu_meteors(),
+    null,
+    null,
+    this
+  );
+
+  startButton = this.add.image(400,280,"startButton")
+  .setScale(.3)
+  .setDepth(1)
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey));
+
+  skinsButton = this.add.image(400,380,"skinsButton")
+  .setScale(.2)
+  .setDepth(1)
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  this.scene.start(characterscenekey));
+}
+
+mainMenu.update = function (){}
 
 var characterScreen = new Phaser.Scene(characterscenekey);
 
 characterScreen.create = function () {
   this.add.image(400, 300, "character_screen");
   
-  startButton = this.add.text(70, 400, 'Basketball')
-    .setOrigin(0.5)
-    .setPadding(5)
-    .setStyle({ backgroundColor: '#111' })
-    .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => 
-    player_skin = "player")
-    .on('pointerdown', () => 
-    this.scene.start(level1scenekey))
+startButton = this.add.text(70, 400, 'Basketball')
+  .setOrigin(0.5)
+  .setPadding(5)
+  .setStyle({ backgroundColor: '#111' })
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  player_skin = "basketball")
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey))
 
-startButton = this.add.text(220, 400, 'CDawg')
+startButton = this.add.text(220, 400, 'Cdawg')
   .setOrigin(0.5)
   .setPadding(5)
   .setStyle({ backgroundColor: '#111' })
@@ -595,10 +687,7 @@ characterScreen.update = function (){
 var level1Scene = new Phaser.Scene(level1scenekey);
 
 level1Scene.create = function() {
-    //music
-  music = this.sound.add("gaming_music",{loop:true,volume:0.5});
-  music.play();
-
+  music.setVolume(.5);
 
   this.add.image(400, 300, "sky");
   mscore = score();
@@ -827,6 +916,8 @@ level1Scene.update = function(){
 var level2Scene = new Phaser.Scene(level2scenekey);
 
 level2Scene.create = function() {
+  music.setVolume(1);
+
   this.time.timeScale = 1;
   this.add.image(400, 300, "night").setScale(2);
     // Display Score at Start of Game
@@ -986,4 +1077,5 @@ var game = new Phaser.Game(config);
 
 game.scene.add(level1scenekey,level1Scene);
 game.scene.add(characterscenekey,characterScreen);
+game.scene.add(mainmenuscenekey, mainMenu);
 game.scene.add(level2scenekey, level2Scene);
