@@ -1,6 +1,6 @@
 
 import sqlite3
-from flask import Flask, request, jsonify, json, render_template, url_for, redirect, flash
+from flask import Flask, request, jsonify, json, render_template, url_for, redirect, flash, session
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -30,19 +30,14 @@ def load_user(username):
 
 @app.route('/api/get', methods = ['GET'])
 def getJson():
-    return {"data:":
-                [
-                    {
-                        "Group": "A",
-                        "Title":"Top 5 Scores",
-                        "<1st Name>": "<1st score>",
-                    	"<2nd Name>": "<2nd score>",
-                        "<3nd Name>": "<3nd score>",
-                        "<4nd Name>": "<4nd score>",
-                        "<5nd Name>": "<5nd score>",
-                    }
-                ]
-            }
+    leaderboard = []
+
+    top_5_scores = User.query.order_by(User.topScore.desc()).limit(5).all()
+    i = 1
+    for user in top_5_scores:
+        leaderboard.append(f'{i}"{user.username}" : "{user.topScore}"')
+        i += 1
+    return json.dumps(leaderboard)
 
 @app.route('/api/update_user', methods = ['PUT'])
 def updateUser():
@@ -134,7 +129,6 @@ def testingDB():
 def getCurrentUser():
     if current_user.is_authenticated:
         user = User.query.filter_by(id=current_user.id).first()
-        print(user.getJson())
         return user.getJson()
     else:
         return "Error login required"
@@ -144,8 +138,48 @@ def getCurrentUser():
 @app.route('/', methods = ['GET','POST'])
 def index():
     if request.method == 'POST':
+        #for using the navbar login
+        if request.form.get('login-nav') is not None:
+            username = request.form.get('username-nav')
+            password = request.form.get('password-nav')
+            user = User.query.filter_by(username=username).first()
+            if user:
+                if check_password_hash(user.password,password):
+                   login_user(user,remember=True)
+                   return redirect(url_for("index"))
+                
         
-        
+        elif request.form.get('create_new_user-nav') is not None:
+            newUser = request.form.get('username-nav')
+            newPass = request.form.get('password-nav')
+            user = User.query.filter_by(username=newUser).first()
+
+            #user exist
+            if(user):
+                return redirect(url_for("index"))
+            #username too short
+            elif len(newUser) < 4:
+                return redirect(url_for("index"))
+            #password too short
+            elif len(newPass) < 6:
+                return redirect(url_for("index"))
+            #valid
+            else:
+                newUser = User(username=newUser, password=generate_password_hash(newPass,method='sha256'))
+                db.session.add(newUser)
+                db.session.commit()
+                login_user(newUser,remember=True)
+                return redirect(url_for("index"))
+        elif request.form.get('logout-nav') is not None:
+            logout_user()
+            return redirect(url_for('index'))
+
+            
+
+
+
+
+        #for using the login below the JS
         if request.form.get('login') is not None:
            username = request.form.get('username')
            password = request.form.get('password')
@@ -160,13 +194,9 @@ def index():
            else:
                flash("Incorrect username or password, try again.", category = 'error')
 
-
-
-
-
         elif request.form.get('create_new_user') is not None:
-            newUser = request.form['username']
-            newPass = request.form['password']
+            newUser = request.form.get('username')
+            newPass = request.form.get('password')
 
             user = User.query.filter_by(username=newUser).first()
             if(user):
@@ -183,7 +213,6 @@ def index():
                 return redirect(url_for("index"))
             
         elif request.form.get('logout') is not None:
-            print("RUNS")
             logout_user()
             return redirect(url_for('index'))
         

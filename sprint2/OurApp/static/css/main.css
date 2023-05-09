@@ -17,8 +17,57 @@ main{
     padding-top: 0%;
     display:flex;
     animation: space 240s linear infinite;
+    color:white;
 }
 
+.navbar-login p{
+    display:flex;
+    height:100%;
+    text-align:center;
+    color:white;
+    align-items: center;
+    top:0px;
+}
+.navbar-signout{
+    margin:5px;
+    border-radius: 10px;
+    margin-left:20px;
+    margin-right:30px;
+    padding-right:5px;
+    padding-left:5px;
+    position:relative;
+    outline: 2px solid black;
+}
+.signed-in-navbar h3{
+    color:white;
+    margin-left:10px;
+}
+.navbar-signout:hover {
+    outline:4px solid greenyellow;
+}
+.navbar-login-text{
+    padding-right:10px;
+}
+.username-text-box:focus {
+    outline:4px solid greenyellow;
+}
+.navbar-submit{
+    outline: 2px solid black;
+    border-radius:10px;
+    margin-left:10px;
+    margin-right:10px;
+    padding-right:5px;
+    padding-left:5px;
+    position:relative;
+
+}
+.navbar-submit:hover{
+    outline: 2px solid greenyellow;
+}
+.username-text-box {
+    padding-left:5px;
+    padding-right:5px;
+}
 @keyframes space {
 	0% {
 		background-position: 0% 50%;
@@ -82,23 +131,52 @@ main{
       0 22px 30px rgba(0, 0, 0, 0.9);
       
 }
-.game{
-    padding:0%;
-    margin:0%;
+.game-outer{
+    background:linear-gradient(rgb(62, 5, 40), rgb(223, 15, 167));
+    width:820px;
+    height:620px;
     display:grid;
     position:relative;
     margin-left: auto;
     margin-right: auto;
     align-self:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:15px;
+}
+.game-outer::before{
+    content:"";
+    position:absolute;
+    width:800px;
+    height:800px;
+    background:linear-gradient(rgb(133, 20, 118),rgb(41, 16, 80));
+    animation:glow-effect 10s linear infinite;
+}
+.game-outer::after{
+    content:"";
+    position:absolute;
+    inset:4px;
+    border-radius:4px;
+}
+@keyframes glow-effect{
+    0%{
+        transform:rotate(0deg);
+    }
+    100%{
+        transform:rotate(360deg);
+    }
+}
+.game{
+    display:flex;
+    padding:0%;
+    margin:10px;
     outline: solid 3px black;
     width:800px;
     height:600px;   
+    z-index:10;
+    border-radius:10px;
 }
-.game-canvas{
-    align-self:center;
-    width:800px;
-    height:600px;   
-}
+
 .table-container{
     display:flex;
     align-items:center;
@@ -109,6 +187,7 @@ main{
 
 
 .outer-descript{
+    border-radius:20px;
     flex:33%;
     display:flex;
     align-items:center;
@@ -135,6 +214,7 @@ main{
 }
 
 .description{
+    border-radius:20px;
     flex:100%;
     margin:10px;
     padding:10px;
@@ -145,6 +225,7 @@ main{
     overflow:auto;
 }
 .high-score{
+    border-radius:20px;
     margin:10px;
     padding:10px;
     flex:100%;
@@ -155,6 +236,7 @@ main{
 }
 
 .log-in{
+    border-radius:20px;
     margin:10px;
     padding:10px;
     flex:100%;
@@ -162,4 +244,30 @@ main{
     background: rgb(24, 133, 223);
     outline:solid 1px black;
     overflow:auto;
+}
+
+.login-box{
+    border-radius:8px;
+    padding:4px;
+    margin:5px;
+}
+
+.login-box:focus {
+    outline:4px solid greenyellow;
+}
+
+.login-submit{
+    color:white;
+    margin:5px;
+    margin-right:100px;
+    background: radial-gradient(
+        farthest-corner at 40px 40px,
+        #f35 0%,
+        #43e 100%
+      );
+    background-size: 400%;
+    animation: space 10s ease infinite;
+}
+.login-submit:hover{
+    outline: 4px solid greenyellow;
 }
