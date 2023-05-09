@@ -82,68 +82,70 @@ async function test() {
 }
 test();
 
-function meteors(scene, meteor_key) {
+function meteors_normal(scene, mk) {
   // private
-  this.meteors = scene.physics.add.group();
-  this.meteors_numbers = 1;
-  this.min_angle = 0; // default is 0 as meteors fall straight down
-  this.max_angle = 0;
-  this.meteor_key = meteor_key;
-  this.meteor_start_range = {
+  let meteors = scene.physics.add.group();
+  let meteors_numbers = 1;
+  let min_angle = 0; // default is 0 as meteors fall straight down
+  let max_angle = 0;
+  let meteor_key = mk;
+  let meteor_start_range = {
     min_x: 0,
     max_x: 750,
     min_y: 0,
     max_y: 100,
   };
 
+  const set_meteor_start_range = (msr) => {
+    meteor_start_range = Object.assign({}, msr);
+  };
+
+  const get_meteor_start_range = () => {
+    return Object.assign({}, meteor_start_range);
+  };
+
   // public
   const get_meteors = () => {
-    return this.meteors;
+    return meteors;
   };
-  const set_meteors = (meteors) => {
-    this.meteors = meteors;
+  const set_meteors = (m) => {
+    meteors = meteors;
   };
 
   const get_meteor_key = () => {
-    return this.meteor_key;
+    return meteor_key;
   };
-  const set_meteor_key = (meteor_key) => {
-    this.meteor_key = meteor_key;
+  const set_meteor_key = (mk) => {
+    meteor_key = meteor_key;
   };
 
   const get_meteor_numbers = () => {
-    return this.meteors_numbers;
+    return meteors_numbers;
   };
-  const set_meteors_number = (meteors_numbers) => {
-    this.meteors_numbers = meteors_numbers;
+  const set_meteors_number = (mn) => {
+    meteors_numbers = mn;
   };
 
   const get_angle = () => {
     return {
-      min_angle: this.min_angle,
-      max_angle: this.max_angle,
+      min_angle: min_angle,
+      max_angle: max_angle,
     };
   };
   const set_angle = (angle = { min_angle: 0, max_angle: 0 }) => {
-    this.max_angle = angle.max_angle;
-    this.min_angle = angle.min_angle;
+    max_angle = angle.max_angle;
+    min_angle = angle.min_angle;
   };
 
-  const create_meteor = (meteor_max_scale) => {
-    for (let index = 0; index < this.meteors_numbers; index++) {
-      var meteor = this.meteors.create(
-        Phaser.Math.Between(
-          this.meteor_start_range.min_x,
-          this.meteor_start_range.max_x
-        ),
-        Phaser.Math.Between(
-          this.meteor_start_range.min_y,
-          this.meteor_start_range.max_y
-        ),
-        this.meteor_key
+  const create_meteor = (mms) => {
+    for (let index = 0; index < meteors_numbers; index++) {
+      var meteor = meteors.create(
+        Phaser.Math.Between(meteor_start_range.min_x, meteor_start_range.max_x),
+        Phaser.Math.Between(meteor_start_range.min_y, meteor_start_range.max_y),
+        meteor_key
       );
-      meteor.angle = Phaser.Math.Between(this.min_angle, this.max_angle);
-      meteor.setScale(Phaser.Math.FloatBetween(1, meteor_max_scale));
+      meteor.angle = Phaser.Math.Between(min_angle, max_angle);
+      meteor.setScale(Phaser.Math.FloatBetween(1, mms));
       // meteor.setBounce(0.5);
       meteor.setCollideWorldBounds(true);
     }
@@ -151,7 +153,132 @@ function meteors(scene, meteor_key) {
 
   const sideHits = () => {
     let hit = 0;
-    this.meteors.getChildren().forEach((meteor) => {
+    meteors.getChildren().forEach((meteor) => {
+      if (
+        !scene.physics.world.bounds.contains(
+          meteor.x + meteor.displayWidth / 2 + 1,
+          meteor.y
+        ) ||
+        !scene.physics.world.bounds.contains(
+          meteor.x - meteor.displayWidth / 2 - 1,
+          meteor.y
+        )
+      ) {
+        meteor.destroy();
+        hit++;
+        console.log("hit");
+      }
+    });
+    return hit;
+  };
+
+  const move_meteor = (velocity) => {
+    if (meteors.getChildren() !== undefined) {
+      meteors.getChildren().forEach((meteor) => {
+        meteor.setVelocityX(
+          Math.sin((meteor.angle * Math.PI) / 180) * velocity
+        );
+        meteor.setVelocityY(
+          Math.cos((meteor.angle * Math.PI) / 180) * velocity
+        );
+      });
+    }
+  };
+
+  const destroy_all = () => {
+    meteors.destroy();
+  };
+
+  return {
+    get_angle,
+    get_meteor_numbers,
+    get_meteor_key,
+    get_meteors,
+    set_angle,
+    set_meteors_number,
+    set_meteor_key,
+    set_meteors,
+    set_meteor_start_range,
+    get_meteor_start_range,
+    create_meteor,
+    move_meteor,
+    sideHits,
+    destroy_all,
+  };
+}
+
+function meteors_horizontal(scene, mk) {
+  // private
+  let meteors = scene.physics.add.group();
+  let meteors_numbers = 1;
+  let min_angle = 0; // default is 0 as meteors fall straight down
+  let max_angle = 0;
+  let meteor_key = mk;
+  let meteor_start_range = {
+    min_x: 0,
+    max_x: 750,
+    min_y: 0,
+    max_y: 100,
+  };
+
+  const set_meteor_start_range = (msr) => {
+    meteor_start_range = Object.assign({}, msr);
+  };
+
+  const get_meteor_start_range = () => {
+    return Object.assign({}, meteor_start_range);
+  };
+
+  // public
+  const get_meteors = () => {
+    return meteors;
+  };
+  const set_meteors = (m) => {
+    meteors = meteors;
+  };
+
+  const get_meteor_key = () => {
+    return meteor_key;
+  };
+  const set_meteor_key = (mk) => {
+    meteor_key = meteor_key;
+  };
+
+  const get_meteor_numbers = () => {
+    return meteors_numbers;
+  };
+  const set_meteors_number = (mn) => {
+    meteors_numbers = mn;
+  };
+
+  const get_angle = () => {
+    return {
+      min_angle: min_angle,
+      max_angle: max_angle,
+    };
+  };
+  const set_angle = (angle = { min_angle: 0, max_angle: 0 }) => {
+    max_angle = angle.max_angle;
+    min_angle = angle.min_angle;
+  };
+
+  const create_meteor = (mms) => {
+    for (let index = 0; index < meteors_numbers; index++) {
+      var meteor = meteors.create(
+        Phaser.Math.Between(meteor_start_range.min_x, meteor_start_range.max_x),
+        Phaser.Math.Between(meteor_start_range.min_y, meteor_start_range.max_y),
+        meteor_key
+      );
+      meteor.angle = Phaser.Math.Between(min_angle, max_angle);
+      meteor.setScale(Phaser.Math.FloatBetween(1, mms));
+      // meteor.setBounce(0.5);
+      meteor.setCollideWorldBounds(true);
+    }
+  };
+
+  const sideHits = () => {
+    let hit = 0;
+    meteors.getChildren().forEach((meteor) => {
       if (
         !scene.physics.world.bounds.contains(
           meteor.x + meteor.displayWidth / 2 + 1,
@@ -170,8 +297,8 @@ function meteors(scene, meteor_key) {
   };
 
   const move_meteor = (velocity) => {
-    if (this.meteors.getChildren() !== undefined) {
-      this.meteors.getChildren().forEach((meteor) => {
+    if (meteors.getChildren() !== undefined) {
+      meteors.getChildren().forEach((meteor) => {
         meteor.setVelocityX(
           Math.sin((meteor.angle * Math.PI) / 180) * velocity
         );
@@ -183,7 +310,7 @@ function meteors(scene, meteor_key) {
   };
 
   const destroy_all = () => {
-    this.meteors.destroy();
+    meteors.destroy();
   };
 
   return {
@@ -195,6 +322,8 @@ function meteors(scene, meteor_key) {
     set_meteors_number,
     set_meteor_key,
     set_meteors,
+    set_meteor_start_range,
+    get_meteor_start_range,
     create_meteor,
     move_meteor,
     sideHits,
@@ -202,30 +331,30 @@ function meteors(scene, meteor_key) {
   };
 }
 
-function bonuses(scene, bonus_keys = ["star", "star", "star"]) {
-  this.bonuses = scene.physics.add.group();
-  this.bonus_keys = bonus_keys;
-  this.bonus_types = ["speed", "score", "invincible"];
-  this.cur_bonus = "";
-  this.min_angle = 0; // default is 0 as bonuses fall straight down
-  this.max_angle = 0;
+function bonuses(scene, bk = ["star", "star", "star"]) {
+  let bonuses = scene.physics.add.group();
+  let bonus_keys = bk;
+  let bonus_types = ["speed", "score", "invincible"];
+  let cur_bonus = "";
+  let min_angle = 0; // default is 0 as bonuses fall straight down
+  let max_angle = 0;
   const get_bonuses = () => {
-    return this.bonuses;
+    return bonuses;
   };
-  const set_bonuses = (bonuses) => {
-    this.bonuses = bonuses;
+  const set_bonuses = (b) => {
+    bonuses = b;
   };
   // No set for bonus_types
   const get_bonus_types = () => {
-    return this.bonus_types;
+    return bonus_types;
   };
 
   const get_bonus_keys = () => {
-    return this.bonus_keys;
+    return bonus_keys;
   };
 
-  const set_bonus_keys = (bonus_keys) => {
-    if (bonus_keys.length !== this.bonus_types.length) {
+  const set_bonus_keys = (bk) => {
+    if (bk.length !== bonus_types.length) {
       console.error("mismatch bonus_keys length with bonus_types length\n");
       return;
     }
@@ -233,33 +362,36 @@ function bonuses(scene, bonus_keys = ["star", "star", "star"]) {
   };
 
   const get_cur_bonus = () => {
-    return this.cur_bonus;
+    return cur_bonus;
   };
-  const set_cur_bonus = (cur_bonus) => {
-    this.cur_bonus = cur_bonus;
+  const set_cur_bonus = (cb) => {
+    cur_bonus = cb;
   };
 
   const get_angle = () => {
-    return {
-      min_angle: this.min_angle,
-      max_angle: this.max_angle,
-    };
+    return Object.assign(
+      {},
+      {
+        min_angle,
+        max_angle,
+      }
+    );
   };
   const set_angle = (angle = { min_angle: 0, max_angle: 0 }) => {
-    this.max_angle = angle.max_angle;
-    this.min_angle = angle.min_angle;
+    max_angle = angle.max_angle;
+    min_angle = angle.min_angle;
   };
   const createBonus = () => {
-    let index = Phaser.Math.Between(0, this.bonus_types.length - 1);
-    this.cur_bonus = this.bonus_types[index];
-    let bonus_key = this.bonus_keys[index];
+    let index = Phaser.Math.Between(0, bonus_types.length - 1);
+    cur_bonus = bonus_types[index];
+    let bonus_key = bonus_keys[index];
     // console.log(cur_bonus);
-    var bonus = this.bonuses.create(Phaser.Math.Between(50, 750), 0, bonus_key);
-    bonus.angle = Phaser.Math.Between(this.min_angle, this.max_angle);
-    bonus.setCollideWorldBounds(true);
-    if (this.cur_bonus === "speed") {
+    let bonus = bonuses.create(Phaser.Math.Between(50, 750), 0, bonus_key);
+    bonus.angle = Phaser.Math.Between(min_angle, max_angle);
+    // bonus.setCollideWorldBounds(true);
+    if (cur_bonus === "speed") {
       bonus.setTint(0xff2200); // red
-    } else if (this.cur_bonus === "score") {
+    } else if (cur_bonus === "score") {
       bonus.setTint(0xff002); //green
     } else {
       bonus.setTint(0xccdd00); //yellow
@@ -268,8 +400,8 @@ function bonuses(scene, bonus_keys = ["star", "star", "star"]) {
   };
 
   const move_bonus = (velocity) => {
-    if (this.bonuses.getChildren() !== undefined) {
-      this.bonuses.getChildren().forEach((bonus) => {
+    if (bonuses.getChildren() !== undefined) {
+      bonuses.getChildren().forEach((bonus) => {
         bonus.setVelocityX(Math.sin((bonus.angle * Math.PI) / 180) * velocity);
         bonus.setVelocityY(Math.cos((bonus.angle * Math.PI) / 180) * velocity);
       });
@@ -290,57 +422,57 @@ function bonuses(scene, bonus_keys = ["star", "star", "star"]) {
   };
 }
 
-function player(scene, start = { x: 20, y: 50 }, key) {
-  this.player = scene.physics.add.sprite(start.x, start.y, key);
-  this.speed = 200;
-  this.frame_rate = 30;
-  this.key = key;
-  this.invincible = false;
-  this.player.setBounce(0.2);
-  this.player.setCollideWorldBounds(true);
-  this.player.setOffset(8, 12);
+function player(scene, start = { x: 20, y: 50 }, k) {
+  let player = scene.physics.add.sprite(start.x, start.y, k);
+  let speed = 200;
+  let frame_rate = 30;
+  let key = k;
+  let invincible = false;
+  // player.setBounce(0.2);
+  player.setCollideWorldBounds(true);
+  player.setOffset(8, 12);
   const get_player = () => {
-    return this.player;
+    return player;
   };
-  const set_player = (player) => {
-    this.player = player;
+  const set_player = (p) => {
+    player = p;
   };
   const get_key = () => {
-    return this.key;
+    return key;
   };
-  const set_key = (key) => {
-    this.key = key;
+  const set_key = (k) => {
+    key = k;
   };
 
   const get_speed = () => {
-    return this.speed;
+    return speed;
   };
-  const set_speed = (speed) => {
-    this.speed = speed;
+  const set_speed = (s) => {
+    speed = s;
   };
 
   const get_frame_rate = () => {
-    return this.frame_rate;
+    return frame_rate;
   };
 
-  const set_frame_rate = (frame_rate) => {
-    this.frame_rate = frame_rate;
+  const set_frame_rate = (fr) => {
+    frame_rate = fr;
   };
   const moveX = (left, right) => {
-    this.player.setVelocityX((right - left) * this.speed);
+    player.setVelocityX((right - left) * speed);
   };
   const moveY = (top, bottom) => {
-    this.player.setVelocityY((bottom - top) * this.speed);
+    player.body.setGravityY((bottom - top) * speed);
   };
 
   const isInvincible = () => {
-    return this.invincible;
+    return invincible;
   };
-  const set_invincible = (invincible) => {
+  const set_invincible = (i) => {
     if (typeof invincible === "boolean") {
-      this.invincible = invincible;
+      invincible = i;
     } else {
-      this.invincible = false;
+      invincible = false;
     }
   };
   return {
@@ -360,47 +492,49 @@ function player(scene, start = { x: 20, y: 50 }, key) {
 }
 
 function score() {
-  this.score = 0;
-  this.speed_scale = 1;
-  this.score_scale = 1;
-  this.invincible = false;
+  let score = 0;
+  let speed_scale = 1;
+  let score_scale = 1;
+  let invincible = false;
 
-  const set_score = (score = 0) => {
-    this.score = score;
+  const set_score = (s = 0) => {
+    score = s;
   };
   const get_score = () => {
-    return this.score;
+    return score;
   };
 
-  const set_speed_scale = (speed_scale = 1) => {
-    this.speed_scale = speed_scale;
+  const set_speed_scale = (speed_s = 1) => {
+    speed_scale = speed_s;
   };
   const get_speed_scale = () => {
-    return this.speed_scale;
+    return speed_scale;
   };
 
-  const set_score_scale = (score_scale = 1) => {
-    this.score_scale = score_scale;
+  const set_score_scale = (score_s = 1) => {
+    score_scale = score_s;
   };
   const get_score_scale = () => {
-    return this.speed_scale;
+    return speed_scale;
   };
 
-  const set_invincible = (invincible = false) => {
-    this.invincible = invincible;
+  const set_invincible = (i = false) => {
+    invincible = i;
   };
   const get_invincible = () => {
-    return this.invincible;
+    return invincible;
   };
 
   const increase_score = () => {
-    this.score += this.score_scale;
+    score += score_scale;
   };
-
+  /**
+   * set score_scale, speed_scale to 1, and invincible to false.
+   */
   const reset = () => {
-    this.score_scale = 1;
-    this.speed_scale = 1;
-    this.invincible = false;
+    score_scale = 1;
+    speed_scale = 1;
+    invincible = false;
   };
 
   return {
@@ -1093,31 +1227,94 @@ level3Scene.create = function () {
   ground.getChildren()[0].setOffset(0, 12);
 
   level3platforms = this.physics.add.staticGroup();
-  level3platforms.create(0, 300, "level3platform").setScale(1).refreshBody();
-  level3platforms.create(750, 300, "level3platform").setScale(1).refreshBody();
-  level3platforms.getChildren()[0].setOffset(0, 12);
+  level3platforms
+    .create(600, 400, "level3platform")
+    .setScale(0.25, 1)
+    .refreshBody();
+  level3platforms
+    .create(200, 400, "level3platform")
+    .setScale(0.25, 1)
+    .refreshBody();
+  level3platforms.getChildren().forEach((platform) => {
+    platform.setOffset(0, 12);
+  });
 
   // mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
   mplayer = player(this, { x: 100, y: 400 }, "player");
-  // level2 has increase player speed
-  mplayer.set_speed(500);
-  bombs = meteors(this, "bomb");
+  mplayer.set_speed(200);
+  mplayer.get_player().setGravityY(600);
+
   // bombs.set_meteors(this.physics.add.group());
-  bombs.set_angle({ min_angle: -10, max_angle: 10 });
-  bombs.set_meteors_number(4);
-  mplayer.get_player().setGravityY(300);
+  bombs = meteors_normal(this, "bomb");
+  bombs.set_angle({ min_angle: -30, max_angle: 30 });
+  bombs.set_meteors_number(2);
+  // increase meteor number to 3 after 10 seconds
+  console.log((new Date()).toLocaleTimeString());
+  this.time.addEvent({
+    delay: 5000,
+    loop: false,
+    callback: () => {
+      console.log((new Date()).toLocaleTimeString());
+      bombs.set_meteors_number(bombs.get_meteor_numbers() + 1);
+    },
+  });
+  horizontalMeteors = meteors_horizontal(this, "bomb");
+  horizontalMeteors.set_meteors_number(1);
+  this.time.addEvent({
+    delay: 4000,
+    loop: true,
+    callback: function () {
+      /**
+       * @todo:add signal to show which side the meteor comes from
+       */
+      let side = Phaser.Math.Between(1, 10);
+      // start from left
+      if (side <= 5) {
+        horizontalMeteors.set_meteor_start_range(
+          (msr = {
+            min_x: 20,
+            max_x: 40,
+            min_y: 450,
+            max_y: 450,
+          })
+        );
+        horizontalMeteors.set_angle({ min_angle: 90, max_angle: 90 });
+      } else {
+        horizontalMeteors.set_meteor_start_range(
+          (msr = {
+            min_x: 760,
+            max_x: 780,
+            min_y: 450,
+            max_y: 450,
+          })
+        );
+        horizontalMeteors.set_angle({ min_angle: -90, max_angle: -90 });
+      }
+      horizontalMeteors.create_meteor(meteor_max_scale - 1);
+      if (horizontalMeteors.get_meteors().getChildren().length !== 0) {
+        horizontalMeteors
+          .get_meteors()
+          .getChildren()
+          .forEach((meteor) => {
+            meteor.setGravityY(-300);
+          });
+      }
+    },
+  });
+
+  mplayer.get_player().setGravityY(500);
   mplayer.get_player().setCollideWorldBounds(true);
 
   // Create bonus group
   mbonuses = bonuses(this);
   mbonuses.set_bonuses(this.physics.add.group());
-  mbonuses.set_angle({ min_angle: -30, max_angle: 30 });
+  mbonuses.set_angle({ min_angle: -10, max_angle: 10 });
   // time event for creating meteor
   this.time.addEvent({
     delay: 1000,
     loop: true,
     callback: function () {
-      bombs.create_meteor(meteor_max_scale);
+      bombs.create_meteor(meteor_max_scale / 2);
     },
   });
   // time event are creating bonuses
@@ -1133,6 +1330,14 @@ level3Scene.create = function () {
   this.physics.add.collider(
     mplayer.get_player(),
     bombs.get_meteors(),
+    hitBomb,
+    null,
+    this
+  );
+
+  this.physics.add.collider(
+    mplayer.get_player(),
+    horizontalMeteors.get_meteors(),
     hitBomb,
     null,
     this
@@ -1174,40 +1379,52 @@ level3Scene.create = function () {
   this.physics.add.collider(mplayer.get_player(), ground);
   this.physics.add.collider(mplayer.get_player(), level3platforms);
   this.physics.add.collider(mbonuses.get_bonuses(), level3platforms);
+
   // Collision between bombs and platforms, destroy bomb and update score
   this.physics.add.collider(bombs.get_meteors(), ground, function (bomb) {
     bomb.destroy();
     mscore.increase_score();
     scoreText.setText("Current Score: " + mscore.get_score());
   });
+  this.physics.add.collider(
+    horizontalMeteors.get_meteors(),
+    ground,
+    function (meteor) {
+      meteor.destroy();
+      mscore.increase_score();
+      scoreText.setText("Current Score: " + mscore.get_score());
+    }
+  );
 
   // add text object to the game
-  let text = this.add.text(400, 300, "", {
+  let bonusText = this.add.text(400, 300, "", {
     font: "30px Courier",
     fill: "#FFFFFF",
   });
-  text.setOrigin(0.5);
+  bonusText.setOrigin(0.5);
   // collision between bonuses and player
   this.physics.add.collider(
-    mplayer,
+    mplayer.get_player(),
     mbonuses.get_bonuses(),
     function (player, bonus) {
-      player.get_player().setTint(bonus.tintTopLeft);
+      player.setTint(bonus.tintTopLeft);
       bonus.destroy();
+      mscore.reset();
+      bonusText.setText("");
       start_reset = Date.now();
       if (mbonuses.get_cur_bonus() === "speed") {
         // bonus_speed_scale = 2;
         mscore.set_speed_scale(2);
-        text.setText("Speed bonus activated!");
+        bonusText.setText("Speed bonus activated!");
       } else if (mbonuses.get_cur_bonus() === "score") {
         // bonus_score_scale = 2;
         mscore.set_score_scale(2);
-        text.setText("Score bonus activated!");
+        bonusText.setText("Score bonus activated!");
       } else {
         // bonus_invincible = true;
         mscore.set_invincible(true);
         play.set_invincible(true);
-        text.setText("Invincibility bonus activated!");
+        bonusText.setText("Invincibility bonus activated!");
       }
     }
   );
@@ -1246,7 +1463,17 @@ level3Scene.update = function () {
     (mplayer.get_player().body.onFloor() ||
       mplayer.get_player().body.touching.down)
   ) {
-    mplayer.get_player().setVelocityY(-600);
+    // mplayer.get_player().setVelocityY(-600);
+    mplayer.get_player().body.velocity.y = -500;
+    mplayer.get_player().anims.play("up", true);
+  } else if (
+    !gameOver &&
+    cursors.up.isUp &&
+    (!mplayer.get_player().body.onFloor() ||
+      !mplayer.get_player().body.touching.down)
+  ) {
+    // mplayer.get_player().setVelocityY(-600);
+    mplayer.get_player().body.velocity.y = 200;
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
@@ -1254,8 +1481,15 @@ level3Scene.update = function () {
   }
 
   // speeds up how fast the objects fall
-  mbonuses.move_bonus(300);
-  bombs.move_meteor(600);
+  mscore.set_score(
+    mscore.get_score() +
+      (bombs.sideHits() + horizontalMeteors.sideHits()) *
+        mscore.get_score_scale()
+  );
+  scoreText.setText("Current Score: " + mscore.get_score());
+  mbonuses.move_bonus(200);
+  bombs.move_meteor(300);
+  horizontalMeteors.move_meteor(200);
 };
 
 // END OF LEVEL 3 CODE
