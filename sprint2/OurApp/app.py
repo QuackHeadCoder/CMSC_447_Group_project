@@ -30,19 +30,14 @@ def load_user(username):
 
 @app.route('/api/get', methods = ['GET'])
 def getJson():
-    return {"data:":
-                [
-                    {
-                        "Group": "A",
-                        "Title":"Top 5 Scores",
-                        "<1st Name>": "<1st score>",
-                    	"<2nd Name>": "<2nd score>",
-                        "<3nd Name>": "<3nd score>",
-                        "<4nd Name>": "<4nd score>",
-                        "<5nd Name>": "<5nd score>",
-                    }
-                ]
-            }
+    leaderboard = []
+
+    top_5_scores = User.query.order_by(User.topScore.desc()).limit(5).all()
+    i = 1
+    for user in top_5_scores:
+        leaderboard.append(f'{i}"{user.username}" : "{user.topScore}"')
+        i += 1
+    return json.dumps(leaderboard)
 
 @app.route('/api/update_user', methods = ['PUT'])
 def updateUser():
