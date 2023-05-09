@@ -1181,7 +1181,7 @@ level2Scene.update = function () {
 
   // speeds up how fast the objects fall
   mbonuses.move_bonus(300);
-  bombs.move_meteor(300);
+  bombs.move_meteor(400);
 
   if (mscore.get_score() == 50) {
     level3 = true;
@@ -1199,8 +1199,8 @@ level3Scene.preload = function () {
   this.load.image("bomb", "../static/js/assets/bomb.png");
   this.load.image("star", "../static/js/assets/star.png");
   this.load.image("night", "../static/js/assets/level2night.webp");
-  this.load.image("level3ground", "../static/js/assets/emptyplatform.png");
-  this.load.image("level3platform", "../static/js/assets/level2platform.png");
+  //this.load.image("level3ground", "../static/js/assets/emptyplatform.png");
+  //this.load.image("level3platform", "../static/js/assets/level2platform.png");
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -1224,16 +1224,16 @@ level3Scene.create = function () {
   scoreText.setText("Current Score: " + mscore.get_score());
 
   ground = this.physics.add.staticGroup();
-  ground.create(400, 725, "level3ground").setScale(2).refreshBody();
+  ground.create(400, 725, "level2ground").setScale(2).refreshBody();
   ground.getChildren()[0].setOffset(0, 12);
 
   level3platforms = this.physics.add.staticGroup();
   level3platforms
-    .create(600, 400, "level3platform")
+    .create(600, 400, "level2platform")
     .setScale(0.25, 1)
     .refreshBody();
   level3platforms
-    .create(200, 400, "level3platform")
+    .create(200, 400, "level2platform")
     .setScale(0.25, 1)
     .refreshBody();
   level3platforms.getChildren().forEach((platform) => {
@@ -1343,6 +1343,7 @@ level3Scene.create = function () {
     null,
     this
   );
+  /*
   this.anims.create({
     key: "left",
     frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
@@ -1373,6 +1374,7 @@ level3Scene.create = function () {
     frames: [{ key: mplayer.get_key(), frame: 4 }],
     frameRate: mplayer.get_frame_rate(),
   });
+  */
 
   cursors = this.input.keyboard.createCursorKeys();
 
@@ -1429,7 +1431,6 @@ level3Scene.create = function () {
       }
     }
   );
-
   this.time.addEvent({
     delay: 10,
     loop: true,
@@ -1438,7 +1439,7 @@ level3Scene.create = function () {
         start_reset = 0;
         mscore.reset();
         mbonuses.set_cur_bonus("");
-        text.setText("");
+        bonusText.setText("");
         mplayer.set_invincible(false);
         mplayer.get_player().clearTint();
       }
