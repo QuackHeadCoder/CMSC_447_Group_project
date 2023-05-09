@@ -565,12 +565,58 @@ var config = {
   },
 };
 /* CONSTANT */
+function menu_meteors(scene, meteor_key) {
+  // private
+  this.menu_meteors = scene.physics.add.group();
+  this.meteors_numbers = 1;
+  this.min_angle = -5; // default is 0 as meteors fall straight down
+  this.max_angle = 5;
+  this.meteor_key = meteor_key;
+  this.meteor_start_range = {
+    min_x: 0,
+    max_x: 750,
+    min_y: 0,
+    max_y: 50,
+  };
+
+  // public
+
+  const get_menu_meteors = () => {
+    return this.meteors;
+  };
+
+  const create_menu_meteor = (meteor_max_scale) => {
+    for (let index = 0; index < this.meteors_numbers; index++) {
+      var meteor = this.menu_meteors.create(
+        Phaser.Math.Between(
+          this.meteor_start_range.min_x,
+          this.meteor_start_range.max_x
+        ),
+        Phaser.Math.Between(
+          this.meteor_start_range.min_y,
+          this.meteor_start_range.max_y
+        ),
+        this.meteor_key
+      );
+      meteor.setScale(Phaser.Math.FloatBetween(1, meteor_max_scale));
+      meteor.setBounce(0.7);
+      meteor.setCollideWorldBounds(true);
+    }
+  }
+
+  return {
+    get_menu_meteors,
+    create_menu_meteor,
+  };
+}
 
 // meteor
 const meteor_max_scale = 4;
 const level1scenekey = "level1Scene";
 const level2scenekey = "level2Scene";
 const level3scenekey = "level3Scene";
+const mainmenuscenekey = "mainMenuScene";
+const characterscenekey = "characterScene";
 
 /* END OF CONSTANT */
 
@@ -582,6 +628,7 @@ var bonus_score_scale = 1;
 var bonus_invincible = false;
 var bonus_type = ["speed", "score", "invincible"];
 var cur_bonus = "";
+var player_skin = "default";
 // END OF CHANGING BONUS
 
 var mplayer;
@@ -603,7 +650,7 @@ function hitBomb(player, bomb) {
   if (!mscore.get_invincible()) {
     this.physics.pause();
     player.setTint(0xff0000);
-    player.anims.play("turn");
+    player.anims.play("dead");
     gameOver = true;
     gameOverText = this.add.text(300, 250, "Game Over!", {
       font: "30px Courier",
@@ -617,7 +664,6 @@ function hitBomb(player, bomb) {
     scoreText.setText("Current Score: " + mscore.get_score());
   }
 }
-
 // end of support functions
 /*Preload anything needed for all scenes here */
 // function preload() {
@@ -705,7 +751,118 @@ function hitBomb(player, bomb) {
 function create() {}
 
 function update() {
-  this.scene.start(level1scenekey);
+  this.scene.start(mainmenuscenekey);
+}
+
+
+var mainMenu = new Phaser.Scene(mainmenuscenekey);
+
+mainMenu.preload = function(){
+  this.load.image("sky", "../static/js/assets/sky.png");
+  this.load.image("startButton", "../static/js/assets/startButton.png");
+  this.load.image("skinsButton", "../static/js/assets/skinsButton.png");
+  this.load.image("bomb", "../static/js/assets/bomb.png");
+  this.load.audio("gaming_music",["../static/js/assets/hey_ya.mp3"]);
+}
+
+mainMenu.create = function () {
+  music = this.sound.add("gaming_music",{loop:true,volume:0.2});
+  music.play();
+
+  this.add.image(400,300, "sky");
+
+/*
+  bombs2 = menu_meteors(this, "bomb");
+  this.time.addEvent({
+    delay: 3000,
+    loop: true,
+    callback: function () {
+      bombs2.create_menu_meteor(meteor_max_scale);
+    },
+  });
+
+  this.physics.add.collider(
+    bombs2.get_menu_meteors(),
+    bombs2.get_menu_meteors(),
+    null,
+    null,
+    this
+  );
+*/
+  startButton = this.add.image(400,280,"startButton")
+  .setScale(.3)
+  .setDepth(1)
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  this.scene.start(level1scenekey));
+
+  skinsButton = this.add.image(400,380,"skinsButton")
+  .setScale(.2)
+  .setDepth(1)
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => 
+  this.scene.start(characterscenekey));
+}
+
+mainMenu.update = function (){}
+
+var characterScreen = new Phaser.Scene(characterscenekey);
+
+characterScreen.preload = function () {
+  this.load.image("character_screen", "../static/js/assets/skyfall_character.jpg");
+}
+
+characterScreen.create = function () {
+  this.add.image(400, 300, "character_screen");
+  startButton = this.add.text(70, 400, 'Basketball')
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => 
+    player_skin = "basketball")
+    .on('pointerdown', () => 
+    this.scene.start(level1scenekey))
+
+  startButton = this.add.text(220, 400, 'Cdawg')
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => 
+    player_skin = "cdawg")
+    .on('pointerdown', () => 
+    this.scene.start(level1scenekey))
+
+  startButton = this.add.text(385, 400, 'DjSang')
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => 
+    player_skin = "djsang")
+    .on('pointerdown', () => 
+    this.scene.start(level1scenekey))
+
+  startButton = this.add.text(535, 400, 'Duck')
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', () => 
+    player_skin = "duck")
+    .on('pointerdown', () => 
+    this.scene.start(level1scenekey))
+
+    startButton = this.add.text(700, 400, 'Pig')
+      .setOrigin(0.5)
+      .setPadding(5)
+      .setStyle({ backgroundColor: '#111' })
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => 
+      player_skin = "pig")
+      .on('pointerdown', () => 
+      this.scene.start(level1scenekey))
 }
 
 /* LEVEL 1 CODE ENDS */
@@ -713,14 +870,33 @@ var level1Scene = new Phaser.Scene(level1scenekey);
 
 level1Scene.preload = function () {
   console.log(this);
-  this.load.image("sky", "../static/js/assets/sky.png");
   this.load.image("ground", "../static/js/assets/platform.png");
-  this.load.image("bomb", "../static/js/assets/bomb.png");
   this.load.image("star", "../static/js/assets/star.png");
   this.load.image("night", "../static/js/assets/level2night.webp");
+  this.load.image("sky", "../static/js/assets/sky.png");
   this.load.image("level2ground", "../static/js/assets/emptyplatform.png");
   this.load.image("level2platform", "../static/js/assets/level2platform.png");
-  this.load.spritesheet("player", "../static/js/assets/dude.png", {
+  this.load.spritesheet("basketball", "../static/js/assets/players/basketballSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("cdawg", "../static/js/assets/players/cdawgSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("duck", "../static/js/assets/players/duckSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("djsang", "../static/js/assets/players/djsangSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("pig", "../static/js/assets/players/pigSprite.png", {
+    frameWidth: 32,
+    frameHeight: 48,
+  });
+  this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
@@ -815,7 +991,7 @@ level1Scene.create = function () {
   // player = this.physics.add.sprite(16, 450, "player");
   // player.setBounce(0.2);
   // player.setCollideWorldBounds(true);
-  mplayer = player(this, { x: 200, y: 450 }, "player");
+  mplayer = player(this, { x: 200, y: 450 }, player_skin);
 
   // Create a group for bombs
   // bombs = this.physics.add.group();
@@ -870,22 +1046,30 @@ level1Scene.create = function () {
     frameRate: mplayer.get_frame_rate(),
     repeat: -1,
   });
-
   this.anims.create({
     key: "turn",
-    frames: [{ key: mplayer.get_key(), frame: 4 }],
-    frameRate: mplayer.get_frame_rate(),
+    frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
+      start: 4,
+      end: 7,
+    }),
+    frameRate: mplayer.get_frame_rate()/2,
+    repeat: -1,
   });
-
   this.anims.create({
     key: "right",
     frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
-      start: 5,
-      end: 8,
+      start: 8,
+      end: 11,
     }),
     frameRate: mplayer.get_frame_rate(),
     repeat: -1,
   });
+
+  this.anims.create({
+    key: "dead",
+    frames: [{ key: mplayer.get_key(), frame: 7}],
+    frameRate: mplayer.get_frame_rate(),
+  })
 
   // Initialize keyboard inputs
   cursors = this.input.keyboard.createCursorKeys();
@@ -989,7 +1173,7 @@ level1Scene.update = function () {
     mplayer.get_player().anims.play("right", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // Collision between bonuses and platforms, destroy bonuses and update score
@@ -1176,7 +1360,7 @@ level2Scene.update = function () {
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn",true);
   }
 
   // speeds up how fast the objects fall
@@ -1479,7 +1663,7 @@ level3Scene.update = function () {
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn");
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // speeds up how fast the objects fall
@@ -1508,7 +1692,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [level1Scene,level2Scene,level3Scene],
+  scene: [mainMenu,characterScreen,level1Scene,level2Scene,level3Scene],
 };
 
 mscore = score();
