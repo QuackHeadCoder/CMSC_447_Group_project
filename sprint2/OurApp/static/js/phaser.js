@@ -819,7 +819,7 @@ level1Scene.create = function () {
 
   // Create a group for bombs
   // bombs = this.physics.add.group();
-  bombs = meteors(this, "bomb");
+  bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
   bombs.set_meteors_number(4);
 
@@ -894,7 +894,8 @@ level1Scene.create = function () {
   this.physics.add.collider(mplayer.get_player(), platforms);
 
   // Add collision between player and bombs, end game if collision happens
-  this.physics.add.collider(mplayer, bombs.get_meteors(), hitBomb, null, this);
+
+  this.physics.add.collider(mplayer.get_player(), bombs.get_meteors(), hitBomb, null, this);
 
   // add text object to the game
   let text = this.add.text(400, 300, "", {
@@ -1031,7 +1032,7 @@ level2Scene.create = function () {
   mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
   // level2 has increase player speed
   mplayer.set_speed(500);
-  bombs.set_meteors(this.physics.add.group());
+  bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
   bombs.set_meteors_number(4);
   mplayer.get_player().setGravityY(300);
@@ -1506,7 +1507,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [level3Scene],
+  scene: [level1Scene,level2Scene,level3Scene],
 };
 
 mscore = score();
