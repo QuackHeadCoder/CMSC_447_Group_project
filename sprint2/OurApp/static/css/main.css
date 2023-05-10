@@ -90,7 +90,6 @@ main{
 }
 
 .middle-container{
-    overflow-y:auto;
     flex:80%;
     padding:2%;
     outline: solid,3px, black;
