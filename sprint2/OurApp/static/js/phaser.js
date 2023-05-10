@@ -626,10 +626,12 @@ var level3 = false;
 var changedScene = false;
 var nextLevelText = "";
 var colliderBomb;
+var death;
 
 // support functions
 function hitBomb(player, bomb) {
   if (!mscore.get_invincible()) {
+    death.play();
     console.log(this.scene.key);
     this.physics.pause();
     player.setTint(0xff0000);
@@ -663,7 +665,7 @@ function hitBomb(player, bomb) {
       }
       );
 
-    this.time.removeAllEvents();
+    // this.time.removeAllEvents();
     if (this.scene.key === level1scenekey) {
       updateUser(1, mscore.get_score());
     } else if (this.scene.key === level2scenekey) {
@@ -957,7 +959,7 @@ level1Scene.create = function () {
     delay: 1000,
     loop: true,
     callback: function () {
-      if (!level2) {
+      if (!level2 && !gameOver) {
         bombs.create_meteor(meteor_max_scale);
       }
     },
@@ -983,7 +985,7 @@ level1Scene.create = function () {
     delay: 5000,
     loop: true,
     callback: function () {
-      if (!level2) {
+      if (!level2 && !gameOver) {
         mbonuses.createBonus();
       }
     },
@@ -1185,7 +1187,7 @@ level2Scene.create = function () {
   this.time.removeAllEvents();
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
-  bombs.set_meteors_number(1);
+  bombs.set_meteors_number(3);
   mplayer.get_player().setGravityY(300);
   mplayer.get_player().setCollideWorldBounds(true);
 
@@ -1197,7 +1199,9 @@ level2Scene.create = function () {
     delay: 1000,
     loop: true,
     callback: function () {
-      bombs.create_meteor(meteor_max_scale);
+      if(!gameOver){
+        bombs.create_meteor(meteor_max_scale);
+      }
     },
   });
   // time event are creating bonuses
@@ -1205,7 +1209,9 @@ level2Scene.create = function () {
     delay: 5000,
     loop: true,
     callback: function () {
-      mbonuses.createBonus();
+      if(!gameOver){
+        mbonuses.createBonus();
+      }
     },
   });
 
@@ -1427,40 +1433,43 @@ level3Scene.create = function () {
     delay: 4000,
     loop: true,
     callback: function () {
-      /**
-       * @todo:add signal to show which side the meteor comes from
-       */
-      let side = Phaser.Math.Between(1, 10);
-      // start from left
-      if (side <= 5) {
-        horizontalMeteors.set_meteor_start_range(
-          (msr = {
-            min_x: 20,
-            max_x: 40,
-            min_y: 450,
-            max_y: 450,
-          })
-        );
-        horizontalMeteors.set_angle({ min_angle: 90, max_angle: 90 });
-      } else {
-        horizontalMeteors.set_meteor_start_range(
-          (msr = {
-            min_x: 760,
-            max_x: 780,
-            min_y: 450,
-            max_y: 450,
-          })
-        );
-        horizontalMeteors.set_angle({ min_angle: -90, max_angle: -90 });
-      }
-      horizontalMeteors.create_meteor(meteor_max_scale - 1);
-      if (horizontalMeteors.get_meteors().getChildren().length !== 0) {
-        horizontalMeteors
-          .get_meteors()
-          .getChildren()
-          .forEach((meteor) => {
-            meteor.setGravityY(-300);
-          });
+      if (!gameOver){
+        /**
+         * @todo:add signal to show which side the meteor comes from
+         */
+        let side = Phaser.Math.Between(1, 10);
+        // start from left
+        if (side <= 5) {
+          horizontalMeteors.set_meteor_start_range(
+            (msr = {
+              min_x: 20,
+              max_x: 40,
+              min_y: 450,
+              max_y: 450,
+            })
+          );
+          horizontalMeteors.set_angle({ min_angle: 90, max_angle: 90 });
+        } else {
+          horizontalMeteors.set_meteor_start_range(
+            (msr = {
+              min_x: 760,
+              max_x: 780,
+              min_y: 450,
+              max_y: 450,
+            })
+          );
+          horizontalMeteors.set_angle({ min_angle: -90, max_angle: -90 });
+        }
+        
+        horizontalMeteors.create_meteor(meteor_max_scale - 1);
+        if (horizontalMeteors.get_meteors().getChildren().length !== 0) {
+          horizontalMeteors
+            .get_meteors()
+            .getChildren()
+            .forEach((meteor) => {
+              meteor.setGravityY(-300);
+            });
+        }
       }
     },
   });
@@ -1477,7 +1486,9 @@ level3Scene.create = function () {
     delay: 1000,
     loop: true,
     callback: function () {
-      bombs.create_meteor(meteor_max_scale / 2);
+      if(!gameOver){
+        bombs.create_meteor(meteor_max_scale / 2);
+      }
     },
   });
   // time event are creating bonuses
@@ -1485,7 +1496,9 @@ level3Scene.create = function () {
     delay: 5000,
     loop: true,
     callback: function () {
-      mbonuses.createBonus();
+      if(!gameOver){
+        mbonuses.createBonus();
+      }
     },
   });
 
