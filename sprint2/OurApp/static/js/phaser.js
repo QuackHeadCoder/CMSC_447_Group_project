@@ -80,7 +80,7 @@ async function test() {
   data = await getData();
   console.log(data["currentLevel"]);
 }
-test();
+// test();
 
 function meteors_normal(scene, mk) {
   // private
@@ -186,7 +186,7 @@ function meteors_normal(scene, mk) {
   };
 
   const destroy_all = () => {
-    meteors.destroy();
+    meteors.clear((removeFromScene = true));
   };
 
   return {
@@ -310,7 +310,7 @@ function meteors_horizontal(scene, mk) {
   };
 
   const destroy_all = () => {
-    meteors.destroy();
+    meteors.clear((removeFromScene = true));
   };
 
   return {
@@ -602,7 +602,7 @@ function menu_meteors(scene, meteor_key) {
       meteor.setBounce(0.7);
       meteor.setCollideWorldBounds(true);
     }
-  }
+  };
 
   return {
     get_menu_meteors,
@@ -643,12 +643,14 @@ var gameOver = false;
 var gameOverText;
 var level2 = false;
 var level3 = false;
+var changedScene = false;
 var nextLevelText = "";
 var colliderBomb;
 
 // support functions
 function hitBomb(player, bomb) {
   if (!mscore.get_invincible()) {
+    console.log(this.scene.key);
     this.physics.pause();
     player.setTint(0xff0000);
     player.anims.play("dead");
@@ -658,6 +660,13 @@ function hitBomb(player, bomb) {
       fill: "#FFFFFF",
     });
     this.time.removeAllEvents();
+    if (this.scene.key === level1scenekey) {
+      updateUser(1, mscore.get_score());
+    } else if (this.scene.key === level2scenekey) {
+      updateUser(2, mscore.get_score());
+    } else if (this.scene.key === level3scenekey) {
+      updateUser(3, mscore.get_score());
+    }
   } else {
     bomb.destroy();
     // score += bonus_score_scale;
@@ -755,24 +764,23 @@ function update() {
   this.scene.start(mainmenuscenekey);
 }
 
-
 var mainMenu = new Phaser.Scene(mainmenuscenekey);
 
-mainMenu.preload = function(){
+mainMenu.preload = function () {
   this.load.image("sky", "../static/js/assets/sky.png");
   this.load.image("startButton", "../static/js/assets/startButton.png");
   this.load.image("skinsButton", "../static/js/assets/skinsButton.png");
   this.load.image("bomb", "../static/js/assets/bomb.png");
-  this.load.audio("gaming_music",["../static/js/assets/hey_ya.mp3"]);
-}
+  this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
+};
 
 mainMenu.create = function () {
-  music = this.sound.add("gaming_music",{loop:true,volume:0.2});
+  music = this.sound.add("gaming_music", { loop: true, volume: 0.2 });
   music.play();
 
-  this.add.image(400,300, "sky");
+  this.add.image(400, 300, "sky");
 
-/*
+  /*
   bombs2 = menu_meteors(this, "bomb");
   this.time.addEvent({
     delay: 3000,
@@ -790,81 +798,79 @@ mainMenu.create = function () {
     this
   );
 */
-  startButton = this.add.image(400,280,"startButton")
-  .setScale(.3)
-  .setDepth(1)
-  .setInteractive({ useHandCursor: true })
-  .on('pointerdown', () => 
-  this.scene.start(level1scenekey));
+  startButton = this.add
+    .image(400, 280, "startButton")
+    .setScale(0.3)
+    .setDepth(1)
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => this.scene.start(level1scenekey));
 
-  skinsButton = this.add.image(400,380,"skinsButton")
-  .setScale(.2)
-  .setDepth(1)
-  .setInteractive({ useHandCursor: true })
-  .on('pointerdown', () => 
-  this.scene.start(characterscenekey));
-}
+  skinsButton = this.add
+    .image(400, 380, "skinsButton")
+    .setScale(0.2)
+    .setDepth(1)
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => this.scene.start(characterscenekey));
+};
 
-mainMenu.update = function (){}
+mainMenu.update = function () {};
 
 var characterScreen = new Phaser.Scene(characterscenekey);
 
 characterScreen.preload = function () {
-  this.load.image("character_screen", "../static/js/assets/skyfall_character.jpg");
-}
+  this.load.image(
+    "character_screen",
+    "../static/js/assets/skyfall_character.jpg"
+  );
+};
 
 characterScreen.create = function () {
   this.add.image(400, 300, "character_screen");
-  startButton = this.add.text(70, 400, 'Basketball')
+  startButton = this.add
+    .text(70, 400, "Basketball")
     .setOrigin(0.5)
     .setPadding(5)
-    .setStyle({ backgroundColor: '#111' })
+    .setStyle({ backgroundColor: "#111" })
     .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => 
-    player_skin = "basketball")
-    .on('pointerdown', () => 
-    this.scene.start(level1scenekey))
+    .on("pointerdown", () => (player_skin = "basketball"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
 
-  startButton = this.add.text(220, 400, 'Cdawg')
+  startButton = this.add
+    .text(220, 400, "Cdawg")
     .setOrigin(0.5)
     .setPadding(5)
-    .setStyle({ backgroundColor: '#111' })
+    .setStyle({ backgroundColor: "#111" })
     .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => 
-    player_skin = "cdawg")
-    .on('pointerdown', () => 
-    this.scene.start(level1scenekey))
+    .on("pointerdown", () => (player_skin = "cdawg"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
 
-  startButton = this.add.text(385, 400, 'DjSang')
+  startButton = this.add
+    .text(385, 400, "DjSang")
     .setOrigin(0.5)
     .setPadding(5)
-    .setStyle({ backgroundColor: '#111' })
+    .setStyle({ backgroundColor: "#111" })
     .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => 
-    player_skin = "djsang")
-    .on('pointerdown', () => 
-    this.scene.start(level1scenekey))
+    .on("pointerdown", () => (player_skin = "djsang"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
 
-  startButton = this.add.text(535, 400, 'Duck')
+  startButton = this.add
+    .text(535, 400, "Duck")
     .setOrigin(0.5)
     .setPadding(5)
-    .setStyle({ backgroundColor: '#111' })
+    .setStyle({ backgroundColor: "#111" })
     .setInteractive({ useHandCursor: true })
-    .on('pointerdown', () => 
-    player_skin = "duck")
-    .on('pointerdown', () => 
-    this.scene.start(level1scenekey))
+    .on("pointerdown", () => (player_skin = "duck"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
 
-    startButton = this.add.text(700, 400, 'Pig')
-      .setOrigin(0.5)
-      .setPadding(5)
-      .setStyle({ backgroundColor: '#111' })
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => 
-      player_skin = "pig")
-      .on('pointerdown', () => 
-      this.scene.start(level1scenekey))
-}
+  startButton = this.add
+    .text(700, 400, "Pig")
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: "#111" })
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => (player_skin = "pig"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
+};
 
 /* LEVEL 1 CODE ENDS */
 var level1Scene = new Phaser.Scene(level1scenekey);
@@ -877,30 +883,46 @@ level1Scene.preload = function () {
   this.load.image("sky", "../static/js/assets/sky.png");
   this.load.image("level2ground", "../static/js/assets/emptyplatform.png");
   this.load.image("level2platform", "../static/js/assets/level2platform.png");
-  this.load.spritesheet("basketball", "../static/js/assets/players/basketballSprite.png", {
-    frameWidth: 32,
-    frameHeight: 48,
-  });
-  this.load.spritesheet("cdawg", "../static/js/assets/players/cdawgSprite.png", {
-    frameWidth: 32,
-    frameHeight: 48,
-  });
+  this.load.spritesheet(
+    "basketball",
+    "../static/js/assets/players/basketballSprite.png",
+    {
+      frameWidth: 32,
+      frameHeight: 48,
+    }
+  );
+  this.load.spritesheet(
+    "cdawg",
+    "../static/js/assets/players/cdawgSprite.png",
+    {
+      frameWidth: 32,
+      frameHeight: 48,
+    }
+  );
   this.load.spritesheet("duck", "../static/js/assets/players/duckSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
-  this.load.spritesheet("djsang", "../static/js/assets/players/djsangSprite.png", {
-    frameWidth: 32,
-    frameHeight: 48,
-  });
+  this.load.spritesheet(
+    "djsang",
+    "../static/js/assets/players/djsangSprite.png",
+    {
+      frameWidth: 32,
+      frameHeight: 48,
+    }
+  );
   this.load.spritesheet("pig", "../static/js/assets/players/pigSprite.png", {
     frameWidth: 32,
     frameHeight: 48,
   });
-  this.load.spritesheet("default", "../static/js/assets/players/defaultSprite.png", {
-    frameWidth: 32,
-    frameHeight: 48,
-  });
+  this.load.spritesheet(
+    "default",
+    "../static/js/assets/players/defaultSprite.png",
+    {
+      frameWidth: 32,
+      frameHeight: 48,
+    }
+  );
   this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
 
   //Progress bar
@@ -1001,7 +1023,7 @@ level1Scene.create = function () {
   bombs.set_meteors_number(4);
 
   // Set timer to create new bombs every 1 second edit delay to change this
-  this.time.addEvent({
+  bomb_creation = this.time.addEvent({
     delay: 1000,
     loop: true,
     callback: function () {
@@ -1027,7 +1049,7 @@ level1Scene.create = function () {
   /**
    * @todo change delay to 10s
    */
-  this.time.addEvent({
+  bonus_creation = this.time.addEvent({
     delay: 5000,
     loop: true,
     callback: function () {
@@ -1053,7 +1075,7 @@ level1Scene.create = function () {
       start: 4,
       end: 7,
     }),
-    frameRate: mplayer.get_frame_rate()/2,
+    frameRate: mplayer.get_frame_rate() / 2,
     repeat: -1,
   });
   this.anims.create({
@@ -1068,9 +1090,9 @@ level1Scene.create = function () {
 
   this.anims.create({
     key: "dead",
-    frames: [{ key: mplayer.get_key(), frame: 7}],
+    frames: [{ key: mplayer.get_key(), frame: 7 }],
     frameRate: mplayer.get_frame_rate(),
-  })
+  });
 
   // Initialize keyboard inputs
   cursors = this.input.keyboard.createCursorKeys();
@@ -1080,7 +1102,13 @@ level1Scene.create = function () {
 
   // Add collision between player and bombs, end game if collision happens
 
-  colliderBomb = this.physics.add.collider(mplayer.get_player(), bombs.get_meteors(), hitBomb, null, this);
+  colliderBomb = this.physics.add.collider(
+    mplayer.get_player(),
+    bombs.get_meteors(),
+    hitBomb,
+    null,
+    this
+  );
 
   // add text object to the game
   let text = this.add.text(400, 300, "", {
@@ -1148,7 +1176,7 @@ level1Scene.create = function () {
 };
 
 level1Scene.update = function () {
-  if (level2) {
+  if (level2 && !changedScene) {
     this.physics.world.removeCollider(colliderBomb);
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
@@ -1160,11 +1188,12 @@ level1Scene.update = function () {
       1500,
       function () {
         nextLevelText = "";
-        this.scene.start(level2scenekey);
+        this.scene.stop(level1scenekey).launch(level2scenekey);
       },
       [],
       this
     );
+    changedScene = true;
   }
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
@@ -1180,7 +1209,7 @@ level1Scene.update = function () {
 
   // Collision between bonuses and platforms, destroy bonuses and update score
   mbonuses.move_bonus(200);
-  bombs.move_meteor(500);
+  bombs.move_meteor(300);
 
   // score += bombs.sideHits();
   mscore.set_score(
@@ -1188,7 +1217,7 @@ level1Scene.update = function () {
   );
   if (mscore.get_score() >= 20) {
     level2 = true;
-    // bombs.destroy_all();
+    bombs.destroy_all();
   }
 };
 
@@ -1196,6 +1225,7 @@ level1Scene.update = function () {
 var level2Scene = new Phaser.Scene(level2scenekey);
 
 level2Scene.create = function () {
+  changedScene = false;
   this.time.timeScale = 1;
   this.add.image(400, 300, "night").setScale(2);
   // Display Score at Start of Game
@@ -1213,14 +1243,22 @@ level2Scene.create = function () {
   level2platforms = this.physics.add.staticGroup();
   level2platforms.create(0, 300, "level2platform").setScale(1).refreshBody();
   level2platforms.create(750, 300, "level2platform").setScale(1).refreshBody();
-  level2platforms.getChildren()[0].setOffset(0, 12);
-
+  level2platforms.create(400, 500, "level2platform").setScale(0.25, 1).refreshBody();
+  level2platforms.getChildren().forEach((p) =>{
+    p.setOffset(0, 12);
+  })
+  // level2platforms.getChildren()[0].setOffset(0, 12);
+  // level2platforms.getChildren()[2].setOffset(0, 12);
   mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
   // level2 has increase player speed
-  mplayer.set_speed(500);
+  mplayer.set_speed(300);
+  this.time.removeAllEvents();
+  // if (bombs.get_meteors() !== undefined) {
+  //   bombs.get_meteors().destroy();
+  // }
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
-  bombs.set_meteors_number(5);
+  bombs.set_meteors_number(1);
   mplayer.get_player().setGravityY(300);
   mplayer.get_player().setCollideWorldBounds(true);
 
@@ -1228,7 +1266,7 @@ level2Scene.create = function () {
   mbonuses.set_bonuses(this.physics.add.group());
   mbonuses.set_angle({ min_angle: -30, max_angle: 30 });
   // time event for creating meteor
-  this.time.addEvent({
+  bomb_creation = this.time.addEvent({
     delay: 1000,
     loop: true,
     callback: function () {
@@ -1236,7 +1274,7 @@ level2Scene.create = function () {
     },
   });
   // time event are creating bonuses
-  this.time.addEvent({
+  bonus_creation = this.time.addEvent({
     delay: 5000,
     loop: true,
     callback: function () {
@@ -1246,7 +1284,7 @@ level2Scene.create = function () {
 
   // Add collision between player and bombs, end game if collision happens
 
- colliderBomb = this.physics.add.collider(
+  colliderBomb = this.physics.add.collider(
     mplayer.get_player(),
     bombs.get_meteors(),
     hitBomb,
@@ -1328,7 +1366,7 @@ level2Scene.create = function () {
 };
 
 level2Scene.update = function () {
-  if (level3) {
+  if (level3 && !changedScene) {
     this.physics.world.removeCollider(colliderBomb);
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 2 Completed!", {
@@ -1340,11 +1378,14 @@ level2Scene.update = function () {
       1500,
       function () {
         nextLevelText = "";
-        this.scene.start("level3Scene");
+        // this.scene.stop(level2scenekey);
+        // this.scene.start(level3scenekey);
+        this.scene.stop(level2scenekey).launch(level3scenekey);
       },
       [],
       this
     );
+    changedScene = true;
   }
   // Player animations based on keyboard inputs
   if (!gameOver && cursors.left.isDown) {
@@ -1359,19 +1400,30 @@ level2Scene.update = function () {
     (mplayer.get_player().body.onFloor() ||
       mplayer.get_player().body.touching.down)
   ) {
-    mplayer.get_player().setVelocityY(-600);
+    // mplayer.get_player().setVelocityY(-600);
+    mplayer.get_player().body.velocity.y = -500;
+    mplayer.get_player().anims.play("up", true);
+  } else if (
+    !gameOver &&
+    cursors.up.isUp &&
+    (!mplayer.get_player().body.onFloor() ||
+      !mplayer.get_player().body.touching.down)
+  ) {
+    // mplayer.get_player().setVelocityY(-600);
+    mplayer.get_player().body.velocity.y = 200;
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
     mplayer.moveX(0, 0);
-    mplayer.get_player().anims.play("turn",true);
+    mplayer.get_player().anims.play("turn", true);
   }
 
   // speeds up how fast the objects fall
   mbonuses.move_bonus(300);
-  bombs.move_meteor(450);
+  bombs.move_meteor(300);
 
-  if (mscore.get_score() == 100) {
+  if (mscore.get_score() >= 50) {
     level3 = true;
+    bombs.destroy_all();
   }
 };
 
@@ -1433,22 +1485,26 @@ level3Scene.create = function () {
   mplayer.get_player().setGravityY(600);
 
   // bombs.set_meteors(this.physics.add.group());
+  this.time.removeAllEvents();
+  if (bombs.get_meteors() !== undefined) {
+    bombs.get_meteors().destroy();
+  }
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -30, max_angle: 30 });
   bombs.set_meteors_number(2);
   // increase meteor number to 3 after 10 seconds
-  console.log((new Date()).toLocaleTimeString());
+  console.log(new Date().toLocaleTimeString());
   this.time.addEvent({
     delay: 5000,
     loop: false,
     callback: () => {
-      console.log((new Date()).toLocaleTimeString());
+      console.log(new Date().toLocaleTimeString());
       bombs.set_meteors_number(bombs.get_meteor_numbers() + 1);
     },
   });
   horizontalMeteors = meteors_horizontal(this, "bomb");
   horizontalMeteors.set_meteors_number(1);
-  this.time.addEvent({
+  hbomb_creation = this.time.addEvent({
     delay: 4000,
     loop: true,
     callback: function () {
@@ -1498,7 +1554,7 @@ level3Scene.create = function () {
   mbonuses.set_bonuses(this.physics.add.group());
   mbonuses.set_angle({ min_angle: -10, max_angle: 10 });
   // time event for creating meteor
-  this.time.addEvent({
+  bomb_creation = this.time.addEvent({
     delay: 1000,
     loop: true,
     callback: function () {
@@ -1506,7 +1562,7 @@ level3Scene.create = function () {
     },
   });
   // time event are creating bonuses
-  this.time.addEvent({
+  bonus_creation = this.time.addEvent({
     delay: 5000,
     loop: true,
     callback: function () {
@@ -1677,7 +1733,7 @@ level3Scene.update = function () {
   );
   scoreText.setText("Current Score: " + mscore.get_score());
   mbonuses.move_bonus(200);
-  bombs.move_meteor(300);
+  bombs.move_meteor(400);
   horizontalMeteors.move_meteor(200);
 };
 
@@ -1695,7 +1751,7 @@ var config = {
       debug: false,
     },
   },
-  scene: [mainMenu,characterScreen,level1Scene,level2Scene,level3Scene],
+  scene: [mainMenu, characterScreen, level1Scene, level2Scene, level3Scene],
 };
 
 mscore = score();
