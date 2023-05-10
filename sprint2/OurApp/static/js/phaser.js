@@ -619,6 +619,8 @@ var mscore;
 var scoreText;
 var gameOver = false;
 var gameOverText;
+var playAgainText;
+var bonusText;
 var level2 = false;
 var level3 = false;
 var changedScene = false;
@@ -633,10 +635,32 @@ function hitBomb(player, bomb) {
     player.setTint(0xff0000);
     player.anims.play("dead");
     gameOver = true;
-    gameOverText = this.add.text(300, 250, "Game Over!", {
+    gameOverText = this.add.text(400, 300 - 100, "Game Over!", {
+      font: "45px Courier",
+      fill: "#FFFFFF",
+    }).setOrigin(0.5);
+
+    playAgainText = this.add.text(400, 300 + 50, "Play again?", {
       font: "30px Courier",
       fill: "#FFFFFF",
-    });
+    }).setOrigin(0.5);
+
+    restartButton = this.add.image(400, 300 + 100,"startButton")
+      .setOrigin(0.5)
+      .setScale(.2)
+      .setDepth(1)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => {
+        bomb.destroy(),
+        gameOverText.setText(""),
+        gameOver = false,
+        this.physics.resume(),
+        mscore.set_score(0),
+        player.clearTint(),
+        this.scene.start(characterscenekey)
+      }
+      );
+
     this.time.removeAllEvents();
     if (this.scene.key === level1scenekey) {
       updateUser(1, mscore.get_score());
@@ -714,7 +738,7 @@ characterScreen.create = function () {
     .on("pointerdown", () => this.scene.start(level1scenekey));
 
   startButton = this.add
-    .text(220, 400, "Cdawg")
+    .text(225, 400, "Cdawg")
     .setOrigin(0.5)
     .setPadding(5)
     .setStyle({ backgroundColor: "#111" })
@@ -723,7 +747,7 @@ characterScreen.create = function () {
     .on("pointerdown", () => this.scene.start(level1scenekey));
 
   startButton = this.add
-    .text(385, 400, "DjSang")
+    .text(395, 400, "DjSang")
     .setOrigin(0.5)
     .setPadding(5)
     .setStyle({ backgroundColor: "#111" })
@@ -732,7 +756,7 @@ characterScreen.create = function () {
     .on("pointerdown", () => this.scene.start(level1scenekey));
 
   startButton = this.add
-    .text(535, 400, "Duck")
+    .text(540, 400, "Duck")
     .setOrigin(0.5)
     .setPadding(5)
     .setStyle({ backgroundColor: "#111" })
@@ -748,6 +772,16 @@ characterScreen.create = function () {
     .setInteractive({ useHandCursor: true })
     .on("pointerdown", () => (player_skin = "pig"))
     .on("pointerdown", () => this.scene.start(level1scenekey));
+
+    startButton = this.add
+    .text(395, 500, "Default")
+    .setOrigin(0.5)
+    .setPadding(5)
+    .setStyle({ backgroundColor: "#111" })
+    .setInteractive({ useHandCursor: true })
+    .on("pointerdown", () => (player_skin = "default"))
+    .on("pointerdown", () => this.scene.start(level1scenekey));
+
 };
 
 /* LEVEL 1 CODE ENDS */
@@ -1464,7 +1498,7 @@ level3Scene.create = function () {
   );
 
   // add text object to the game
-  let bonusText = this.add.text(400, 300, "", {
+  bonusText = this.add.text(400, 300, "", {
     font: "30px Courier",
     fill: "#FFFFFF",
   });
@@ -1487,7 +1521,7 @@ level3Scene.create = function () {
         bonusText.setText("Score bonus activated!");
       } else {
         mscore.set_invincible(true);
-        play.set_invincible(true);
+        mplayer.set_invincible(true);
         bonusText.setText("Invincibility bonus activated!");
       }
     }
