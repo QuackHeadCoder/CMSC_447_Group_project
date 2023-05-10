@@ -1,5 +1,5 @@
 
-import sqlite3
+
 from flask import Flask, request, jsonify, json, render_template, url_for, redirect, flash, session
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
@@ -64,10 +64,10 @@ def updateUser():
                 user.currentLevel = json.get("currentLevel")
                 user.topScore = json.get("topScore")
                 db.session.commit()
-                return 'ok'
+                return "Ok",200
 
     
-    return "Not okay"
+    return "Not okay", 400
 
 #Basic User Information
 class User(UserMixin,db.Model):
@@ -99,32 +99,6 @@ class User(UserMixin,db.Model):
             dateAdded: '{self.dateAdded}'
             """
 
-
-
-#for testing purposes
-def testingDB():
-
-    #clearing database
-    try:
-        db.session.query(User).delete()
-        db.session.commit()
-    except:
-        db.session.rollback()
-    
-    testUsers = [
-        User(id=0,username="testUser1",password=generate_password_hash("password1",method='sha256'),currentLevel=1,topScore=25),
-        User(id=1,username="testUser2",password=generate_password_hash("password2",method='sha256'),currentLevel=1,topScore=125),
-        User(id=2,username="testUser3",password=generate_password_hash("password3",method='sha256'),currentLevel=2,topScore=35),
-        User(id=3,username="testUser4",password=generate_password_hash("password4",method='sha256'),currentLevel=2,topScore=65),
-        User(id=4,username="testUser5",password=generate_password_hash("password5",method='sha256'),currentLevel=1,topScore=85),
-    ]
-
-    #adding some default users
-    for users in testUsers:
-        db.session.add(users)
-
-    db.session.commit()
-
 @app.route('/get',methods=['GET'])
 def getCurrentUser():
     if current_user.is_authenticated:
@@ -150,6 +124,7 @@ def index():
                 
         
         elif request.form.get('create_new_user-nav') is not None:
+            print(request.form)
             newUser = request.form.get('username-nav')
             newPass = request.form.get('password-nav')
             user = User.query.filter_by(username=newUser).first()
@@ -165,6 +140,7 @@ def index():
                 return redirect(url_for("index"))
             #valid
             else:
+                print("Created user")
                 newUser = User(username=newUser, password=generate_password_hash(newPass,method='sha256'))
                 db.session.add(newUser)
                 db.session.commit()
@@ -229,8 +205,7 @@ if __name__ == '__main__':
 
     with app.app_context():
         db.create_all() 
-        #for testing purposes NEED TO REMOVE WHEN FINISHED
-        testingDB()
+
 
         app.run(debug=True)
 
