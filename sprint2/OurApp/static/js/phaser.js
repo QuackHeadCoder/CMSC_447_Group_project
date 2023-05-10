@@ -560,7 +560,7 @@ function menu_meteors(scene, meteor_key) {
   // public
 
   const get_menu_meteors = () => {
-    return this.meteors;
+    return this.menu_meteors;
   };
 
   const create_menu_meteor = (meteor_max_scale) => {
@@ -654,6 +654,8 @@ function hitBomb(player, bomb) {
         bomb.destroy(),
         gameOverText.setText(""),
         gameOver = false,
+        level2 = false,
+        level3 = false,
         this.physics.resume(),
         mscore.set_score(0),
         player.clearTint(),
@@ -690,7 +692,7 @@ mainMenu.preload = function () {
   this.load.image("sky", "../static/js/assets/sky.png");
   this.load.image("startButton", "../static/js/assets/startButton.png");
   this.load.image("skinsButton", "../static/js/assets/skinsButton.png");
-  this.load.image("bomb", "../static/js/assets/bomb.png");
+  this.load.image("bomb", "../static/js/assets/newBomb.png");
   this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
 };
 
@@ -699,6 +701,22 @@ mainMenu.create = function () {
   music.play();
 
   this.add.image(400, 300, "sky");
+
+  bombs2 = menu_meteors(this, "bomb");
+  this.time.addEvent({
+    delay: 3000,
+    loop: true,
+    callback: function () {
+      bombs2.create_menu_meteor(meteor_max_scale);
+    },
+  });
+  this.physics.add.collider(
+    bombs2.get_menu_meteors(),
+    bombs2.get_menu_meteors(),
+    null,
+    null,
+    this
+  );
 
   startButton = this.add
     .image(400, 280, "startButton")
@@ -834,7 +852,12 @@ level1Scene.preload = function () {
       frameHeight: 48,
     }
   );
-  this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
+
+  // Sound Effects
+  this.load.audio("explosion", ["../static/js/assets/boom2.mp3"]);
+  this.load.audio("powerup", ["../static/js/assets/powerup.wav"]);
+  this.load.audio("jump", ["../static/js/assets/jump.mp3"]);
+  this.load.audio("death", ["../static/js/assets/death.mp3"]);
 
   //Progress bar
 
@@ -903,9 +926,9 @@ level1Scene.preload = function () {
   });
 };
 level1Scene.create = function () {
-  //music
-  music = this.sound.add("gaming_music", { loop: true, volume: 0.5 });
-  music.play();
+  explosion = this.sound.add("explosion", {volume: 0.09});
+  powerup = this.sound.add("powerup",{volume: 0.14});
+  death = this.sound.add("death",{volume: 0.2});
 
   this.add.image(400, 300, "sky");
   // mscore = score();
@@ -927,7 +950,7 @@ level1Scene.create = function () {
   // Create a group for bombs
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
-  bombs.set_meteors_number(4);
+  bombs.set_meteors_number(3);
 
   // Set timer to create new bombs every 1 second edit delay to change this
   bomb_creation = this.time.addEvent({
@@ -1043,6 +1066,7 @@ level1Scene.create = function () {
         mplayer.set_invincible(true);
         text.setText("Invincibility bonus activated!");
       }
+      powerup.play();
     }
   );
 
@@ -1067,6 +1091,7 @@ level1Scene.create = function () {
   this.physics.add.collider(bombs.get_meteors(), platforms, function (bomb) {
     bomb.destroy();
     mscore.increase_score();
+    explosion.play();
     scoreText.setText("Current Score: " + mscore.get_score());
   });
 
@@ -1128,6 +1153,10 @@ level1Scene.update = function () {
 var level2Scene = new Phaser.Scene(level2scenekey);
 
 level2Scene.create = function () {
+  explosion = this.sound.add("explosion", {volume: 0.09});
+  powerup = this.sound.add("powerup",{volume: 0.11});
+  jump = this.sound.add("jump",{volume: 0.5});
+  
   changedScene = false;
   this.time.timeScale = 1;
   this.add.image(400, 300, "night").setScale(2);
@@ -1206,6 +1235,7 @@ level2Scene.create = function () {
   this.physics.add.collider(bombs.get_meteors(), platforms, function (bomb) {
     bomb.destroy();
     mscore.increase_score();
+    explosion.play();
     scoreText.setText("Current Score: " + mscore.get_score());
   });
 
@@ -1233,6 +1263,7 @@ level2Scene.create = function () {
         mscore.set_invincible(true);
         text.setText("Invincibility bonus activated!");
       }
+      powerup.play();
     }
   );
 
@@ -1295,6 +1326,7 @@ level2Scene.update = function () {
   ) {
     mplayer.get_player().body.velocity.y = -500;
     mplayer.get_player().anims.play("up", true);
+    jump.play()
   } else if (
     !gameOver &&
     cursors.up.isUp &&
@@ -1333,12 +1365,12 @@ level3Scene.preload = function () {
     frameWidth: 32,
     frameHeight: 48,
   });
-  this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
 };
 
 level3Scene.create = function () {
-  music = this.sound.add("gaming_music", { loop: true, volume: 0.5 });
-  music.play();
+  explosion = this.sound.add("explosion", {volume: 0.09});
+  powerup = this.sound.add("powerup",{volume: 0.11});
+  jump = this.sound.add("jump",{volume: 0.14});
 
   this.time.timeScale = 1;
   this.add.image(400, 300, "night").setScale(2);
@@ -1485,6 +1517,7 @@ level3Scene.create = function () {
   this.physics.add.collider(bombs.get_meteors(), ground, function (bomb) {
     bomb.destroy();
     mscore.increase_score();
+    explosion.play();
     scoreText.setText("Current Score: " + mscore.get_score());
   });
   this.physics.add.collider(
@@ -1524,6 +1557,7 @@ level3Scene.create = function () {
         mplayer.set_invincible(true);
         bonusText.setText("Invincibility bonus activated!");
       }
+      powerup.play();
     }
   );
   this.time.addEvent({
@@ -1563,6 +1597,7 @@ level3Scene.update = function () {
     // mplayer.get_player().setVelocityY(-600);
     mplayer.get_player().body.velocity.y = -500;
     mplayer.get_player().anims.play("up", true);
+    jump.play();
   } else if (
     !gameOver &&
     cursors.up.isUp &&
