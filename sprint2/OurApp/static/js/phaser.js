@@ -644,6 +644,7 @@ var gameOverText;
 var level2 = false;
 var level3 = false;
 var nextLevelText = "";
+var colliderBomb;
 
 // support functions
 function hitBomb(player, bomb) {
@@ -1079,7 +1080,7 @@ level1Scene.create = function () {
 
   // Add collision between player and bombs, end game if collision happens
 
-  this.physics.add.collider(mplayer.get_player(), bombs.get_meteors(), hitBomb, null, this);
+  colliderBomb = this.physics.add.collider(mplayer.get_player(), bombs.get_meteors(), hitBomb, null, this);
 
   // add text object to the game
   let text = this.add.text(400, 300, "", {
@@ -1148,6 +1149,7 @@ level1Scene.create = function () {
 
 level1Scene.update = function () {
   if (level2) {
+    this.physics.world.removeCollider(colliderBomb);
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 1 Completed!", {
       font: "30px Courier",
@@ -1218,7 +1220,7 @@ level2Scene.create = function () {
   mplayer.set_speed(500);
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
-  bombs.set_meteors_number(4);
+  bombs.set_meteors_number(5);
   mplayer.get_player().setGravityY(300);
   mplayer.get_player().setCollideWorldBounds(true);
 
@@ -1244,7 +1246,7 @@ level2Scene.create = function () {
 
   // Add collision between player and bombs, end game if collision happens
 
-  this.physics.add.collider(
+ colliderBomb = this.physics.add.collider(
     mplayer.get_player(),
     bombs.get_meteors(),
     hitBomb,
@@ -1327,6 +1329,7 @@ level2Scene.create = function () {
 
 level2Scene.update = function () {
   if (level3) {
+    this.physics.world.removeCollider(colliderBomb);
     //show text to player for 2 seconds then start next level!
     nextLevelText = this.add.text(250, 250, "Level 2 Completed!", {
       font: "30px Courier",
@@ -1365,9 +1368,9 @@ level2Scene.update = function () {
 
   // speeds up how fast the objects fall
   mbonuses.move_bonus(300);
-  bombs.move_meteor(400);
+  bombs.move_meteor(450);
 
-  if (mscore.get_score() == 50) {
+  if (mscore.get_score() == 100) {
     level3 = true;
   }
 };
