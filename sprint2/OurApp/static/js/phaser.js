@@ -1,10 +1,4 @@
 /**
- * @todo factorize meteor code into 1 object with functions
- * @todo add angle feature for meteor
- * @todo create varied meteor
- */
-
-/**
  * @todo add doc/API call to request user information
  * @todo when game is finished it should make a PUT request to update user information
  */
@@ -64,23 +58,7 @@ async function updateUser(currentLevel, topScore) {
   console.log(ret);
   return ret;
 }
-/*
-A simple example on how to use the get Data function
-As well as how to update User
-Delete this when to reduce console logs
-*/
-async function test() {
-  //since it is async it needs an await call to wait for the response from the server
-  //then once it is stored we can manipulate the data in which way we want such as printing out the id
-  data = await getData();
-  console.log(data["currentLevel"]);
 
-  //updates user level,score
-  updateUser(3, 15);
-  data = await getData();
-  console.log(data["currentLevel"]);
-}
-// test();
 
 function meteors_normal(scene, mk) {
   // private
@@ -669,94 +647,12 @@ function hitBomb(player, bomb) {
     }
   } else {
     bomb.destroy();
-    // score += bonus_score_scale;
     mscore.increase_score();
     scoreText.setText("Current Score: " + mscore.get_score());
   }
 }
 // end of support functions
-/*Preload anything needed for all scenes here */
-// function preload() {
-//   console.log(this);
-//   this.load.image("sky", "../static/js/assets/sky.png");
-//   this.load.image("ground", "../static/js/assets/platform.png");
-//   this.load.image("bomb", "../static/js/assets/bomb.png");
-//   this.load.image("star", "../static/js/assets/star.png");
-//   this.load.image("night", "../static/js/assets/level2night.webp");
-//   this.load.image("level2ground", "../static/js/assets/emptyplatform.png");
-//   this.load.image("level2platform", "../static/js/assets/level2platform.png");
-//   this.load.spritesheet("player", "../static/js/assets/dude.png", {
-//     frameWidth: 32,
-//     frameHeight: 48,
-//   });
-//   this.load.audio("gaming_music", ["../static/js/assets/hey_ya.mp3"]);
 
-//   //Progress bar
-
-//   //creating box and bar and some coloring
-//   var progressBar = this.add.graphics();
-//   var progressBox = this.add.graphics();
-//   progressBox.fillStyle(0x222222, 0.8);
-//   progressBox.fillRect(240, 270, 320, 50);
-
-//   //adjusting dimensions
-//   var width = this.cameras.main.width;
-//   var height = this.cameras.main.height;
-//   var loadingText = this.make.text({
-//     x: width / 2,
-//     y: height / 2 - 50,
-//     text: "Loading...",
-//     style: {
-//       font: "20px monospace",
-//       fill: "#000000",
-//     },
-//   });
-//   loadingText.setOrigin(0.5, 0.5);
-
-//   var percentText = this.make.text({
-//     x: width / 2,
-//     y: height / 2 - 5,
-//     text: "0%",
-//     style: {
-//       font: "18px monospace",
-//       fill: "#ffffff",
-//     },
-//   });
-//   percentText.setOrigin(0.5, 0.5);
-
-//   var assetText = this.make.text({
-//     x: width / 2,
-//     y: height / 2 + 50,
-//     text: "",
-//     style: {
-//       font: "18px monospace",
-//       fill: "#ffffff",
-//     },
-//   });
-//   assetText.setOrigin(0.5, 0.5);
-
-//   //setting value of progress bar and to be placed in the bar
-//   this.load.on("progress", function (value) {
-//     percentText.setText(parseInt(value * 100) + "%");
-//     progressBar.clear();
-//     progressBar.fillStyle(0xffffff, 1);
-//     progressBar.fillRect(250, 280, 300 * value, 30);
-//   });
-
-//   //setting value of asset loading to be placed under bar
-//   this.load.on("fileprogress", function (file) {
-//     assetText.setText("Loading asset: " + file.key);
-//   });
-
-//   //simple cleanup
-//   this.load.on("complete", function () {
-//     progressBar.destroy();
-//     progressBox.destroy();
-//     loadingText.destroy();
-//     percentText.destroy();
-//     assetText.destroy();
-//   });
-// }
 /*LEVEL 1 CODE BEGINS */
 function create() {}
 
@@ -780,24 +676,6 @@ mainMenu.create = function () {
 
   this.add.image(400, 300, "sky");
 
-  /*
-  bombs2 = menu_meteors(this, "bomb");
-  this.time.addEvent({
-    delay: 3000,
-    loop: true,
-    callback: function () {
-      bombs2.create_menu_meteor(meteor_max_scale);
-    },
-  });
-
-  this.physics.add.collider(
-    bombs2.get_menu_meteors(),
-    bombs2.get_menu_meteors(),
-    null,
-    null,
-    this
-  );
-*/
   startButton = this.add
     .image(400, 280, "startButton")
     .setScale(0.3)
@@ -876,7 +754,6 @@ characterScreen.create = function () {
 var level1Scene = new Phaser.Scene(level1scenekey);
 
 level1Scene.preload = function () {
-  console.log(this);
   this.load.image("ground", "../static/js/assets/platform.png");
   this.load.image("star", "../static/js/assets/star.png");
   this.load.image("night", "../static/js/assets/level2night.webp");
@@ -1011,13 +888,9 @@ level1Scene.create = function () {
   platforms.getChildren()[0].setOffset(0, 12);
 
   // Create player
-  // player = this.physics.add.sprite(16, 450, "player");
-  // player.setBounce(0.2);
-  // player.setCollideWorldBounds(true);
   mplayer = player(this, { x: 200, y: 450 }, player_skin);
 
   // Create a group for bombs
-  // bombs = this.physics.add.group();
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
   bombs.set_meteors_number(4);
@@ -1126,15 +999,12 @@ level1Scene.create = function () {
       bonus.destroy();
       start_reset = Date.now();
       if (mbonuses.get_cur_bonus() === "speed") {
-        // bonus_speed_scale = 2;
         mscore.set_speed_scale(2);
         text.setText("Speed bonus activated!");
       } else if (mbonuses.get_cur_bonus() === "score") {
-        // bonus_score_scale = 2;
         mscore.set_score_scale(2);
         text.setText("Score bonus activated!");
       } else {
-        // bonus_invincible = true;
         mscore.set_invincible(true);
         mplayer.set_invincible(true);
         text.setText("Invincibility bonus activated!");
@@ -1211,7 +1081,6 @@ level1Scene.update = function () {
   mbonuses.move_bonus(200);
   bombs.move_meteor(300);
 
-  // score += bombs.sideHits();
   mscore.set_score(
     mscore.get_score() + bombs.sideHits() * mscore.get_score_scale()
   );
@@ -1247,15 +1116,10 @@ level2Scene.create = function () {
   level2platforms.getChildren().forEach((p) =>{
     p.setOffset(0, 12);
   })
-  // level2platforms.getChildren()[0].setOffset(0, 12);
-  // level2platforms.getChildren()[2].setOffset(0, 12);
   mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
   // level2 has increase player speed
   mplayer.set_speed(300);
   this.time.removeAllEvents();
-  // if (bombs.get_meteors() !== undefined) {
-  //   bombs.get_meteors().destroy();
-  // }
   bombs = meteors_normal(this, "bomb");
   bombs.set_angle({ min_angle: -10, max_angle: 10 });
   bombs.set_meteors_number(1);
@@ -1326,15 +1190,12 @@ level2Scene.create = function () {
       bonus.destroy();
       start_reset = Date.now();
       if (mbonuses.get_cur_bonus() === "speed") {
-        // bonus_speed_scale = 2;
         mscore.set_speed_scale(2);
         text.setText("Speed bonus activated!");
       } else if (mbonuses.get_cur_bonus() === "score") {
-        // bonus_score_scale = 2;
         mscore.set_score_scale(2);
         text.setText("Score bonus activated!");
       } else {
-        // bonus_invincible = true;
         mscore.set_invincible(true);
         text.setText("Invincibility bonus activated!");
       }
@@ -1378,8 +1239,6 @@ level2Scene.update = function () {
       1500,
       function () {
         nextLevelText = "";
-        // this.scene.stop(level2scenekey);
-        // this.scene.start(level3scenekey);
         this.scene.stop(level2scenekey).launch(level3scenekey);
       },
       [],
@@ -1400,7 +1259,6 @@ level2Scene.update = function () {
     (mplayer.get_player().body.onFloor() ||
       mplayer.get_player().body.touching.down)
   ) {
-    // mplayer.get_player().setVelocityY(-600);
     mplayer.get_player().body.velocity.y = -500;
     mplayer.get_player().anims.play("up", true);
   } else if (
@@ -1409,7 +1267,6 @@ level2Scene.update = function () {
     (!mplayer.get_player().body.onFloor() ||
       !mplayer.get_player().body.touching.down)
   ) {
-    // mplayer.get_player().setVelocityY(-600);
     mplayer.get_player().body.velocity.y = 200;
     mplayer.get_player().anims.play("up", true);
   } else if (!gameOver) {
@@ -1438,8 +1295,6 @@ level3Scene.preload = function () {
   this.load.image("bomb", "../static/js/assets/bomb.png");
   this.load.image("star", "../static/js/assets/star.png");
   this.load.image("night", "../static/js/assets/level2night.webp");
-  //this.load.image("level3ground", "../static/js/assets/emptyplatform.png");
-  //this.load.image("level3platform", "../static/js/assets/level2platform.png");
   this.load.spritesheet("player", "../static/js/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48,
@@ -1479,12 +1334,10 @@ level3Scene.create = function () {
     platform.setOffset(0, 12);
   });
 
-  // mplayer.set_player(this.physics.add.sprite(16, 450, "player"));
   mplayer = player(this, { x: 100, y: 400 }, "player");
   mplayer.set_speed(200);
   mplayer.get_player().setGravityY(600);
 
-  // bombs.set_meteors(this.physics.add.group());
   this.time.removeAllEvents();
   if (bombs.get_meteors() !== undefined) {
     bombs.get_meteors().destroy();
@@ -1586,38 +1439,6 @@ level3Scene.create = function () {
     null,
     this
   );
-  /*
-  this.anims.create({
-    key: "left",
-    frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
-      start: 0,
-      end: 3,
-    }),
-    frameRate: mplayer.get_frame_rate(),
-    repeat: -1,
-  });
-
-  this.anims.create({
-    key: "turn",
-    frames: [{ key: mplayer.get_key(), frame: 4 }],
-    frameRate: mplayer.get_frame_rate(),
-  });
-
-  this.anims.create({
-    key: "right",
-    frames: this.anims.generateFrameNumbers(mplayer.get_key(), {
-      start: 5,
-      end: 8,
-    }),
-    frameRate: mplayer.get_frame_rate(),
-    repeat: -1,
-  });
-  this.anims.create({
-    key: "up",
-    frames: [{ key: mplayer.get_key(), frame: 4 }],
-    frameRate: mplayer.get_frame_rate(),
-  });
-  */
 
   cursors = this.input.keyboard.createCursorKeys();
 
@@ -1659,15 +1480,12 @@ level3Scene.create = function () {
       bonusText.setText("");
       start_reset = Date.now();
       if (mbonuses.get_cur_bonus() === "speed") {
-        // bonus_speed_scale = 2;
         mscore.set_speed_scale(2);
         bonusText.setText("Speed bonus activated!");
       } else if (mbonuses.get_cur_bonus() === "score") {
-        // bonus_score_scale = 2;
         mscore.set_score_scale(2);
         bonusText.setText("Score bonus activated!");
       } else {
-        // bonus_invincible = true;
         mscore.set_invincible(true);
         play.set_invincible(true);
         bonusText.setText("Invincibility bonus activated!");
